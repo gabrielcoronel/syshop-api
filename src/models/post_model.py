@@ -13,7 +13,7 @@ from models.comment_model import CommentModel
 
 
 class PostModel(StructuredNode):
-    id = UniqueIdProperty()
+    post_id = UniqueIdProperty()
     title = StringProperty(required=True)
     description = StringProperty(required=True)
     amount = IntegerProperty(required=True)
