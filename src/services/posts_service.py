@@ -1,47 +1,65 @@
-from sanic import Blueprint
-from sanic import empty
-from neomodel import DoesNotExist
-from models.category_model import CategoryModel
-from models.post_model import PostModel
-from models.post_multimedia_model import PostMultimediaModel
-from models.comment_model import CommentModel
+import sanic
+from models.post import Post
+from models.category import Category
+from models.post_multimedia_item import PostMultimediaItem
+from models.comment import Comment
 
-posts_blueprint = Blueprint("PostsBlueprint", url_prefix="/posts")
+posts_service = sanic.Blueprint("PostsService", url_prefix="/posts_service")
 
-
-@posts_blueprint.post("/add_comment")
+@posts_service.post("/add_comment")
 def add_comment(request):
     text = request.json["text"]
     post_id = request.json["post_id"]
 
-    comment = CommentModel(text=text).save()
+    comment = Comment(text=text).save()
 
-    post = PostModel.nodes.first(post_id=post_id)
+    post = Post.nodes.first(post_id=post_id)
     post.comments.connect(comment)
 
-    return empty()
+    return sanic.empty()
 
 
-@posts_blueprint.post("/create_post")
+@posts_service.post("/delete_comment")
+def delete_comment(request):
+    comment_id = request.json["comment_id"]
+
+    comment = Comment.nodes.first(comment_id=comment_id)
+    comment.delete()
+
+
+@posts_service.post("/create_post")
 def create_post(request):
     category_names = request.json.pop("categories")
     multimedia_items = request.json.pop("multimedia")
 
-    print(request.json)
-
-    post = PostModel(**request.json).save()
+    post = Post(**request.json).save()
 
     for category_name in category_names:
-        category = CategoryModel.nodes.first_or_none(name=category_name)
+        category = Category.nodes.first_or_none(name=category_name)
 
         if category is None:
-            category = CategoryModel(name=category_name).save()
+            category = Category(name=category_name).save()
 
         post.categories.connect(category)
 
     for multimedia_item in multimedia_items:
-        post_multimedia = PostMultimediaModel(content_bytes=multimedia_item).save()
+        post_multimedia_item = PostMultimediaItem(content_bytes=multimedia_item).save()
 
-        post.multimedia.connect(post_multimedia)
+        post.multimedia_items.connect(post_multimedia_item)
 
-    return empty()
+    return sanic.empty()
+
+
+@posts_service.post("/delete_post")
+def delete_post(request):
+    post_id = request.json["post_id"]
+
+    post = Post.nodes.first(post_id=post_id)
+
+    for multimedia_item in posts.multimedia_items.all():
+        multimedia_item.delete()
+
+    for comment in posts.comments.all():
+        comment.delete()
+
+    post.delete()

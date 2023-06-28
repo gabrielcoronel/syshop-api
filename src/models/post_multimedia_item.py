@@ -1,5 +1,5 @@
 from neomodel import StructuredNode, StringProperty
 
 
-class PostMultimediaModel(StructuredNode):
+class PostMultimediaItem(StructuredNode):
     content_bytes = StringProperty(required=True)

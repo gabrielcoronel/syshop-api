@@ -1,5 +1,5 @@
 from neomodel import StructuredNode, StringProperty
 
 
-class CategoryModel(StructuredNode):
+class Category(StructuredNode):
     name = StringProperty(required=True)

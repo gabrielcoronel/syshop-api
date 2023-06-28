@@ -7,12 +7,12 @@ from neomodel import (
     DateTimeProperty,
     Relationship
 )
-from models.post_multimedia_model import PostMultimediaModel
-from models.category_model import CategoryModel
-from models.comment_model import CommentModel
+from models.category import Category
+from models.post_multimedia_item import PostMultimediaItem
+from models.comment import Comment
 
 
-class PostModel(StructuredNode):
+class Post(StructuredNode):
     post_id = UniqueIdProperty()
     title = StringProperty(required=True)
     description = StringProperty(required=True)
@@ -20,6 +20,6 @@ class PostModel(StructuredNode):
     price = FloatProperty(required=True)
     publication_date = DateTimeProperty(default_now=True)
 
-    categories = Relationship("CategoryModel", "IS_CATEGORY_OF")
-    multimedia = Relationship("PostMultimediaModel", "HAS")
-    comments = Relationship("CommentModel", "HAS")
+    categories = Relationship("Category", "HAS")
+    multimedia_items = Relationship("PostMultimediaItem", "HAS")
+    comments = Relationship("Comment", "HAS")
