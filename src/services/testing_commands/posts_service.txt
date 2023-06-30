@@ -1,0 +1,23 @@
+# Base
+curl -X POST "http://localhost:8000/posts_service/$$" -H "Content-Type: application/json" -d '{$$}'
+
+# Create a post
+curl -X POST "http://localhost:8000/posts_service/create_post" -H "Content-Type: application/json" -d '{"multimedia": ["a", "b"], "categories": ["x", "y"], "title": "title", "description": "description", "amount": 1, "price": 1}'
+
+# Update a post
+curl -X POST "http://localhost:8000/posts_service/update_post" -H "Content-Type: application/json" -d '{"post_id": <post_id>, "multimedia": ["s", "t"], "categories": ["u", "v", "w"], "title": "no", "description": "no", "price": 2, "amount": 2}'
+
+# Delete a post
+curl -X POST "http://localhost:8000/posts_service/delete_post" -H "Content-Type: application/json" -d '{"post_id": <post_id>}'
+
+# Get post by id
+curl -X POST "http://localhost:8000/posts_service/get_post_by_id" -H "Content-Type: application/json" -d '{"post_id": <post_id>}'
+
+# Get all posts
+curl -X POST "http://localhost:8000/posts_service/get_all_posts" -H "Content-Type: application/json" -d '{"sort_by": "$$publication_date", "start": 0, "amount": 3}'
+
+# Add a comment
+curl -X POST "http://localhost:8000/posts_service/add_comment" -H "Content-Type: application/json" -d '{"post_id": <post_id>, "text": "text"}'
+
+# Delete a comment
+curl -X POST "http://localhost:8000/posts_service/delete_comment" -H "Content-Type: application/json" -d '{"comment_id": <comment_id>}'
