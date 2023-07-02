@@ -5,6 +5,7 @@ from neomodel import (
     Relationship
 )
 from models.accounts import BaseAccount
+from models.store_multimedia_item import StoreMultimediaItem
 
 
 class BaseUser(StructuredNode):
@@ -18,3 +19,11 @@ class Customer(BaseUser):
     first_surname = StringProperty(required=True)
     second_surname = StringProperty(required=True)
     picture = StringProperty(required=False)
+
+
+class Store(BaseUser):
+    name = StringProperty(required=True)
+    description = StringProperty(required=True)
+    avatar_bytes = StringProperty(required=True)
+
+    multimedia = Relationship("StoreMultimediaItem", "HAS")
