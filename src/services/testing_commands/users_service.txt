@@ -1,0 +1,20 @@
+# Base
+curl -X POST "http://localhost:8000/users_service/$$" -H "Content-Type: application/json" -d '$$'
+
+# Check whether an email is available for a plain account
+curl -X POST "http://localhost:8000/users_service/check_user_email_is_available" -H "Content-Type: application/json" -d '{"email": "gabrielcoronel0303@gmail.com"}'
+
+# Sign in an user with a plain account
+curl -X POST "http://localhost:8000/users_service/sign_in_user_with_plain_account" -H "Content-Type: application/json" -d '{"email": "gabrielcoronel0303@gmail.com", "password": "hola"}'
+
+# Close a session
+curl -X POST "http://localhost:8000/users_service/close_user_session" -H "Content-Type: application/json" -d '{"token": <token>}'
+
+# Change an user's email
+curl -X POST "http://localhost:8000/users_service/change_user_email" -H "Content-Type: application/json" -d '{"user_id": <user_id>, "email": "gabrielcoronelcascante@gmail.com", "password": "hola"}'
+
+# Change an user's password
+curl -X POST "http://localhost:8000/users_service/change_user_password" -H "Content-Type: application/json" -d '{"user_id": <user_id>, "old_password": "hola", "new_password": "paula"}'
+
+# Delete an user
+curl -X POST "http://localhost:8000/users_service/delete_user" -H "Content-Type: application/json" -d '{"user_id": <user_id>}'

@@ -1,5 +1,5 @@
 from neomodel import StructuredNode, DateTimeProperty
 
 
-class SaleModel(StructuredNode):
+class Sale(StructuredNode):
     sale_date = DateTimeProperty(required=True)

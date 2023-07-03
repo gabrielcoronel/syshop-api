@@ -16,6 +16,7 @@ users_service = sanic.Blueprint(
 
 def is_password_correct(plain_account, password):
     stored_password = decrypt(plain_account.password)
+    print(stored_password)
 
     return password == stored_password
 
@@ -39,7 +40,7 @@ def sign_in_user_with_plain_account(request):
     if not is_password_correct(plain_account, request_password):
         raise SanicException("Incorrect password")
 
-    user = plain_account.user.first()
+    user = plain_account.user.single()
 
     json = create_session_for_user(user)
 
@@ -53,7 +54,7 @@ def close_user_session(request):
     session = Session.nodes.first(token=token)
     session.delete()
 
-    return sanic.empty
+    return sanic.empty()
 
 
 @users_service.post("/change_user_email")
@@ -62,7 +63,7 @@ def change_user_email(request):
     password = request.json["password"]
     new_email = request.json["email"]
 
-    plain_account = BaseUser.nodes.first(user_id=user_id).account
+    plain_account = BaseUser.nodes.first(user_id=user_id).account.single()
 
     if not is_password_correct(plain_account, password):
         raise SanicException("Incorrect password")
@@ -79,7 +80,7 @@ def change_user_password(request):
     old_password = request.json["old_password"]
     new_password = request.json["new_password"]
 
-    plain_account = BaseUser.nodes.first(user_id=user_id).account
+    plain_account = BaseUser.nodes.first(user_id=user_id).account.single()
 
     if not is_password_correct(plain_account, old_password):
         raise SanicException("Incorrect password")
@@ -96,7 +97,11 @@ def delete_user(request):
 
     user = BaseUser.nodes.first(user_id=user_id)
 
-    user.account.first().delete()
+    user.account.single().delete()
+
+    for session in user.sessions.all():
+        session.delete()
+
     user.delete()
 
     return sanic.empty()

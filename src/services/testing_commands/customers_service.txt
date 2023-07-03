@@ -1,0 +1,11 @@
+# Base
+curl -X POST "http://localhost:8000/customers_service/$$" -H "Content-Type: application/json" -d '$$'
+
+# Sign up a customer with a plain account
+curl -X POST "http://localhost:8000/customers_service/sign_up_customer_with_plain_account" -H "Content-Type: application/json" -d '{"email": "gabrielcoronel0303@gmail.com", "password": "hola", "name": "Gabriel", "first_surname": "Coronel", "second_surname": "Cascante", "picture": "blob"}'
+
+# Update a customer
+curl -X POST "http://localhost:8000/customers_service/update_customer" -H "Content-Type: application/json" -d '{"customer_id": <customer_id>, "name": "Alia", "first_surname": "Cascante", "second_surname": "Mora", "picture": "another_blob"}'
+
+# Get a customer by ID
+curl -X POST "http://localhost:8000/customers_service/get_customer_by_id" -H "Content-Type: application/json" -d '{"customer_id": "4e208753de4249fb9a47a7e12a48d5d9"}'

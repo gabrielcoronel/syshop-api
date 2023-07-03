@@ -17,6 +17,7 @@ def encrypt(text):
 def decrypt(encrypted_text):
     fernet_encrypter = Fernet(encryption_key)
 
-    text = fernet_encrypter.decrypt(encrypted_text)
+    encoded_decrypted_text = fernet_encrypter.decrypt(encrypted_text)
+    decrypted_text = encoded_decrypted_text.decode("utf-8")
 
-    return text
+    return decrypted_text

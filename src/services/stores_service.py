@@ -30,7 +30,7 @@ def make_store_from_google_user_information(user_information):
     store = Store(
         name=name,
         description="",
-        avatar_bytes=avatar_bytes
+        avatar=avatar_bytes
     )
 
     return store
@@ -92,7 +92,7 @@ def update_store(request):
 
     store.name = request.json["name"]
     store.description = request.json["description"]
-    store.avatar_bytes = request.json["avatar"]
+    store.avatar = request.json["avatar"]
 
     store.save()
 
@@ -108,7 +108,7 @@ def get_store_by_id(request):
         store_multimedia_item.content_bytes
         for store_multimedia_item in store.multimedia.all()
     ]
-    account_type = store.__class__.__name__
+    account_type = store.account.single().__class__.__name__
 
     json = {
         **store.__properties__,

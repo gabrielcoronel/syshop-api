@@ -84,8 +84,8 @@ def update_customer(request):
     customer = Customer.nodes.first(user_id=customer_id)
 
     customer.name = request.json["name"]
-    customer.first_lastname = request.json["first_lastname"]
-    customer.second_lastname = request.json["second_lastname"]
+    customer.first_surname = request.json["first_surname"]
+    customer.second_surname = request.json["second_surname"]
     customer.picture = request.json["picture"]
 
     customer.save()
@@ -98,7 +98,7 @@ def get_customer_by_id(request):
     customer_id = request.json["customer_id"]
 
     customer = Customer.nodes.first(user_id=customer_id)
-    account_type = customer.__class__.__name__
+    account_type = customer.account.single().__class__.__name__
 
     json = {
         **customer.__properties__,
