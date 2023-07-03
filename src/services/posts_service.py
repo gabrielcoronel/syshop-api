@@ -2,7 +2,6 @@ import sanic
 from models.post import Post
 from models.category import Category
 from models.post_multimedia_item import PostMultimediaItem
-from models.comment import Comment
 
 posts_service = sanic.Blueprint("PostsService", url_prefix="/posts_service")
 
@@ -46,29 +45,6 @@ def make_post_json_view(post):
     }
 
     return json
-
-
-@posts_service.post("/add_comment")
-def add_comment(request):
-    text = request.json["text"]
-    post_id = request.json["post_id"]
-
-    comment = Comment(text=text).save()
-
-    post = Post.nodes.first(post_id=post_id)
-    post.comments.connect(comment)
-
-    return sanic.empty()
-
-
-@posts_service.post("/delete_comment")
-def delete_comment(request):
-    comment_id = request.json["comment_id"]
-
-    comment = Comment.nodes.first(comment_id=comment_id)
-    comment.delete()
-
-    return sanic.empty()
 
 
 @posts_service.post("/create_post")
