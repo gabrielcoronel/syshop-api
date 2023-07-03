@@ -1,6 +1,7 @@
 from neomodel import (
     StructuredNode,
     StringProperty,
+    FloatProperty,
     UniqueIdProperty,
     Relationship
 )
@@ -27,5 +28,8 @@ class Store(BaseUser):
     name = StringProperty(required=True)
     description = StringProperty(required=True)
     avatar = StringProperty(required=True)
+    location_name = StringProperty(required=False)
+    location_longitude = FloatProperty(required=False)
+    location_latitude = FloatProperty(required=False)
 
     multimedia = Relationship("StoreMultimediaItem", "HAS")
