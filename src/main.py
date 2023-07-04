@@ -8,6 +8,7 @@ from services.users_service import users_service
 from services.customers_service import customers_service
 from services.stores_service import stores_service
 from services.comments_service import comments_service
+from services.chat_service import chat_service
 
 load_dotenv()
 
@@ -19,3 +20,4 @@ app.blueprint(users_service)
 app.blueprint(customers_service)
 app.blueprint(stores_service)
 app.blueprint(comments_service)
+app.blueprint(chat_service)

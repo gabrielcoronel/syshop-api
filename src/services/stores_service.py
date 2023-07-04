@@ -25,12 +25,12 @@ def make_store_from_google_user_information(user_information):
     picture_url = user_information["picture"]
 
     name = user_information["given_name"]
-    avatar_bytes = download_file_in_base64(picture_url)
+    picture = download_file_in_base64(picture_url)
 
     store = Store(
         name=name,
         description="",
-        avatar=avatar_bytes,
+        picture=picture,
         location_name=None,
         location_longitude=None,
         location_latitude=None
@@ -95,7 +95,7 @@ def update_store(request):
 
     store.name = request.json["name"]
     store.description = request.json["description"]
-    store.avatar = request.json["avatar"]
+    store.picture = request.json["picture"]
     store.location_name = request.json["location_name"]
     store.location_longitude = request.json["location_longitude"]
     store.location_latitude = request.json["location_latitude"]
