@@ -45,3 +45,18 @@ def delete_comment(request):
     comment.delete()
 
     return sanic.empty()
+
+
+@comments_service.post("/get_post_comments")
+def get_post_comments(request):
+    post_id = request.json["post_id"]
+
+    post = Post.nodes.first(post_id=post_id)
+    comments = post.comments.all()
+
+    json = [
+        comment.__properties__
+        for comment in comments
+    ]
+
+    return sanic.json(json)

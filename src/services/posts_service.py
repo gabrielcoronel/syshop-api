@@ -1,4 +1,5 @@
 import sanic
+from neomodel import db
 from models.post import Post
 from models.users import Store, Customer
 from models.category import Category
@@ -33,17 +34,12 @@ def make_post_json_view(post):
         category.name
         for category in post.categories.all()
     ]
-    comments = [
-        comment.__properties__
-        for comment in post.comments.all()
-    ]
     like_count = len(post.liking_users.all())
 
     json = {
         **post.__properties__,
         "multimedia": multimedia_items,
         "categories": categories,
-        "comments": comments,
         "likes": like_count
     }
 
@@ -140,6 +136,36 @@ def get_post_by_id(request):
     return sanic.json(json)
 
 
+@posts_service.post("/get_customer_liked_posts")
+def get_customer_liked_posts(request):
+    customer_id = request.json["customer_id"]
+
+    customer = Customer.nodes.first(user_id=customer_id)
+    liked_posts = customer.liked_posts.all()
+
+    json = [
+        make_post_json_view(post)
+        for post in liked_posts
+    ]
+
+    return sanic.json(json)
+
+
+@posts_service.post("/get_store_posts")
+def get_store_posts(request):
+    store_id = request.json["store_id"]
+
+    store = Store.nodes.first(user_id=store_id)
+    posts = store.posts.all()
+
+    json = [
+        make_post_json_view(post)
+        for post in posts
+    ]
+
+    return sanic.json(json)
+
+
 @posts_service.post("/get_all_posts")
 def get_all_posts(request):
     start = request.json["start"]
@@ -154,3 +180,42 @@ def get_all_posts(request):
     ]
 
     return sanic.json(json)
+
+
+@posts_service.post("/search_posts_by_metadata")
+def search_posts_by_metadata(request):
+    start = request.json["start"]
+    amount = request.json["amount"]
+    searched_text = request.json["searched_text"]
+    categories = request.json["categories"]
+    sorting_property = request.json["sorting_property"]
+    sorting_schema = request.json["sorting_schema"]
+
+    sorting_schema_keyword = (
+        "ASC" if sorting_schema.lower() == "ascending" else "DESC"
+    )
+
+    query = """
+    MATCH (p:Post)-[:HAS]->(c:Category)
+    WHERE c.name IN $categories
+    AND ((p.title CONTAINS $searched_text)
+         OR (p.description CONTAINS $searched_text))
+    RETURN p AS post
+    ORDER BY $sorting_property $sorting_schema_keyword
+    SKIP $start
+    LIMIT $amount
+    """
+
+    posts, _ = db.cypher_query(
+        query,
+        {
+            "start": start,
+            "amount": amount,
+            "searched_text": searched_text,
+            "categories": categories,
+            "sorting_property": sorting_property,
+            "sorting_schema_keyword": sorting_schema_keyword
+        },
+    )
+
+    return sanic.json(posts)

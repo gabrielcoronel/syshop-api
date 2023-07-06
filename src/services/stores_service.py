@@ -123,3 +123,21 @@ def get_store_by_id(request):
     }
 
     return sanic.json(json)
+
+
+@stores_service.post("/search_stores_by_name")
+def search_stores_by_name(request):
+    start = request.json["start"]
+    amount = request.json["amount"]
+    searched_name = request.json["search"]
+
+    search_results = Store.nodes.filter(
+        name__icontains=searched_name
+    )[start:amount]
+
+    json = [
+        store.__properties__
+        for store in search_results
+    ]
+
+    return sanic.json(json)
