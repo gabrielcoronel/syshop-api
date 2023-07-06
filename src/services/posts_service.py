@@ -1,5 +1,6 @@
 import sanic
 from models.post import Post
+from models.users import BaseUser, Store
 from models.category import Category
 from models.post_multimedia_item import PostMultimediaItem
 
@@ -36,12 +37,14 @@ def make_post_json_view(post):
         comment.__properties__
         for comment in post.comments.all()
     ]
+    like_count = len(post.liking_users.all())
 
     json = {
         **post.__properties__,
         "multimedia": multimedia_items,
         "categories": categories,
-        "comments": comments
+        "comments": comments,
+        "likes": like_count
     }
 
     return json
@@ -49,10 +52,14 @@ def make_post_json_view(post):
 
 @posts_service.post("/create_post")
 def create_post(request):
+    store_id = request.json.pop("store_id")
     categories_names = request.json.pop("categories")
     multimedia_items = request.json.pop("multimedia")
 
+    store = Store.nodes.first(user_id=store_id)
     post = Post(**request.json).save()
+
+    post.store.connect(store)
 
     categories = fetch_categories(categories_names)
 
@@ -60,6 +67,19 @@ def create_post(request):
         post.categories.connect(category)
 
     create_post_multimedia_items(post, multimedia_items)
+
+    return sanic.empty()
+
+
+@posts_service.post("/like_post")
+def like_post(request):
+    user_id = request.json["user_id"]
+    post_id = request.json["post_id"]
+
+    post = Post.nodes.first(post_id=post_id)
+    user = BaseUser.nodes.first(user_id=user_id)
+
+    post.liking_users.connect(user)
 
     return sanic.empty()
 

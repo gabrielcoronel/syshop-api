@@ -7,9 +7,6 @@ from neomodel import (
     DateTimeProperty,
     Relationship
 )
-from models.category import Category
-from models.post_multimedia_item import PostMultimediaItem
-from models.comment import Comment
 
 
 class Post(StructuredNode):
@@ -20,6 +17,8 @@ class Post(StructuredNode):
     price = FloatProperty(required=True)
     publication_date = DateTimeProperty(default_now=True)
 
-    categories = Relationship("Category", "HAS")
-    multimedia_items = Relationship("PostMultimediaItem", "HAS")
-    comments = Relationship("Comment", "HAS")
+    categories = Relationship("models.category.Category", "HAS")
+    multimedia_items = Relationship("models.post_multimedia_item.PostMultimediaItem", "HAS")
+    comments = Relationship("models.comment.Comment", "HAS")
+    liking_users = Relationship("models.users.BaseUser", "LIKES")
+    store = Relationship("models.users.Store", "POSTED")
