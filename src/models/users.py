@@ -5,7 +5,6 @@ from neomodel import (
     UniqueIdProperty,
     Relationship
 )
-from models.store_multimedia_item import StoreMultimediaItem
 
 
 class BaseUser(StructuredNode):
@@ -23,6 +22,7 @@ class Customer(BaseUser):
     second_surname = StringProperty(required=True)
 
     locations = Relationship("models.location.Location", "HAS")
+    purchases = Relationship("models.sale.Sale", "BOUGHT")
 
 
 class Store(BaseUser):
@@ -32,4 +32,5 @@ class Store(BaseUser):
     location_longitude = FloatProperty(required=False)
     location_latitude = FloatProperty(required=False)
 
-    multimedia = Relationship("StoreMultimediaItem", "HAS")
+    multimedia = Relationship("models.store_multimedia_item.StoreMultimediaItem", "HAS")
+    sales = Relationship("models.sale.Sale", "SOLD")
