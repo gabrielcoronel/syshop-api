@@ -1,6 +1,6 @@
 import sanic
 from sanic.exceptions import SanicException
-from models.users import Store
+from models.users import Store, Customer
 from models.store_multimedia_item import StoreMultimediaItem
 from utilities.sessions import create_session_for_user
 from utilities.accounts import create_plain_account, fetch_google_account
@@ -101,6 +101,19 @@ def update_store(request):
     store.location_latitude = request.json["location_latitude"]
 
     store.save()
+
+    return sanic.empty()
+
+
+@stores_service.post("/follow_store")
+def follow_store(request):
+    store_id = request.json["store_id"]
+    customer_id = request.json["customer_id"]
+
+    customer = Customer.nodes.first(user_id=customer_id)
+    store = Store.nodes.first(user_id=store_id)
+
+    store.followers.connect(customer)
 
     return sanic.empty()
 

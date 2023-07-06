@@ -24,6 +24,7 @@ class Customer(BaseUser):
     locations = Relationship("models.location.Location", "HAS")
     purchases = Relationship("models.sale.Sale", "BOUGHT")
     liked_posts = Relationship("models.post.Post", "LIKES")
+    following = Relationship("models.users.Store", "FOLLOWS")
 
 
 class Store(BaseUser):
@@ -36,3 +37,4 @@ class Store(BaseUser):
     multimedia = Relationship("models.store_multimedia_item.StoreMultimediaItem", "HAS")
     sales = Relationship("models.sale.Sale", "SOLD")
     posts = Relationship("models.post.Post", "POSTED")
+    followers = Relationship("models.users.Customer", "FOLLOWS")

@@ -168,6 +168,11 @@ def get_store_posts(request):
 
 @posts_service.post("/get_all_posts")
 def get_all_posts(request):
+    """
+    Este endpoint es principalmente para pruebas.
+    En producción no tiene mucho uso.
+    """
+
     start = request.json["start"]
     amount = request.json["amount"]
     sorting_property = request.json["sort_by"]
@@ -177,6 +182,37 @@ def get_all_posts(request):
     json = [
         make_post_json_view(post)
         for post in posts
+    ]
+
+    return sanic.json(json)
+
+
+@posts_service.post("/get_posts_from_customer_following_stores")
+def get_posts_from_customer_following_stores(request):
+    start = request.json["start"]
+    amount = request.json["amount"]
+    customer_id = request.json["customer_id"]
+
+    query = """
+    MATCH (:Customer {user_id: $customer_id})-[:FOLLOWS]->(:Store)-[:POSTED]->(p:Post)
+    RETURN p AS posts
+    ORDER BY publication_date DESC
+    SKIP $start
+    LIMIT $amount
+    """
+
+    result, _ = db.cypher_query(
+        query,
+        {
+            "start": start,
+            "amount": amount,
+            "customer_id": customer_id
+        },
+    )
+
+    json = [
+        row[0]
+        for row in result
     ]
 
     return sanic.json(json)
@@ -200,13 +236,13 @@ def search_posts_by_metadata(request):
     WHERE c.name IN $categories
     AND ((p.title CONTAINS $searched_text)
          OR (p.description CONTAINS $searched_text))
-    RETURN p AS post
+    RETURN p AS posts
     ORDER BY $sorting_property $sorting_schema_keyword
     SKIP $start
     LIMIT $amount
     """
 
-    posts, _ = db.cypher_query(
+    result, _ = db.cypher_query(
         query,
         {
             "start": start,
@@ -218,4 +254,9 @@ def search_posts_by_metadata(request):
         },
     )
 
-    return sanic.json(posts)
+    json = [
+        row[0]
+        for row in result
+    ]
+
+    return sanic.json(json)
