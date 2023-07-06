@@ -1,6 +1,6 @@
 import sanic
 from models.post import Post
-from models.users import BaseUser, Store
+from models.users import Store, Customer
 from models.category import Category
 from models.post_multimedia_item import PostMultimediaItem
 
@@ -73,13 +73,13 @@ def create_post(request):
 
 @posts_service.post("/like_post")
 def like_post(request):
-    user_id = request.json["user_id"]
+    customer_id = request.json["customer_id"]
     post_id = request.json["post_id"]
 
     post = Post.nodes.first(post_id=post_id)
-    user = BaseUser.nodes.first(user_id=user_id)
+    customer = Customer.nodes.first(user_id=customer_id)
 
-    post.liking_users.connect(user)
+    post.liking_customers.connect(customer)
 
     return sanic.empty()
 

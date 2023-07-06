@@ -20,5 +20,5 @@ class Post(StructuredNode):
     categories = Relationship("models.category.Category", "HAS")
     multimedia_items = Relationship("models.post_multimedia_item.PostMultimediaItem", "HAS")
     comments = Relationship("models.comment.Comment", "HAS")
-    liking_users = Relationship("models.users.BaseUser", "LIKES")
+    liking_customers = Relationship("models.users.Customer", "LIKES")
     store = Relationship("models.users.Store", "POSTED")
