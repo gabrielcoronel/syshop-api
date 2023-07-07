@@ -13,7 +13,7 @@ class BaseUser(StructuredNode):
 
     account = Relationship("models.accounts.BaseAccount", "IDENTIFIES")
     sessions = Relationship("models.session.Session", "HOLDS")
-    chats = Relationship("models.session.Chat", "COMMUNICATES")
+    chats = Relationship("models.chat.Chat", "COMMUNICATES")
 
 
 class Customer(BaseUser):
@@ -30,11 +30,9 @@ class Customer(BaseUser):
 class Store(BaseUser):
     name = StringProperty(required=True)
     description = StringProperty(required=True)
-    location_name = StringProperty(required=False)
-    location_longitude = FloatProperty(required=False)
-    location_latitude = FloatProperty(required=False)
 
     multimedia = Relationship("models.store_multimedia_item.StoreMultimediaItem", "HAS")
     sales = Relationship("models.sale.Sale", "SOLD")
     posts = Relationship("models.post.Post", "POSTED")
     followers = Relationship("models.users.Customer", "FOLLOWS")
+    location = Relationship("models.location.Location", "HAS")

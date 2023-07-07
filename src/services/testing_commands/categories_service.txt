@@ -1,0 +1,5 @@
+# Base
+curl -X POST "http://localhost:8000/categories_service/$$" -H "Content-Type: application/json" -d '$$'
+
+# Search categories by name
+curl -X POST "http://localhost:8000/categories_service/search_categories_by_name" -H "Content-Type: application/json" -d '{"start": 0, "amount": 3, "search": "ol"}'

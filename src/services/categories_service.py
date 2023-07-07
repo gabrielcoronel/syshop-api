@@ -3,7 +3,7 @@ from models.category import Category
 
 categories_service = sanic.Blueprint(
     "CategoriesService",
-    url="/categories_service"
+    url_prefix="/categories_service"
 )
 
 

@@ -30,10 +30,7 @@ def make_store_from_google_user_information(user_information):
     store = Store(
         name=name,
         description="",
-        picture=picture,
-        location_name=None,
-        location_longitude=None,
-        location_latitude=None
+        picture=picture
     )
 
     return store
@@ -96,9 +93,6 @@ def update_store(request):
     store.name = request.json["name"]
     store.description = request.json["description"]
     store.picture = request.json["picture"]
-    store.location_name = request.json["location_name"]
-    store.location_longitude = request.json["location_longitude"]
-    store.location_latitude = request.json["location_latitude"]
 
     store.save()
 

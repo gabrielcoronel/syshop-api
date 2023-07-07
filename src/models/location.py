@@ -1,7 +1,6 @@
 from neomodel import (
     StructuredNode,
     StringProperty,
-    FloatProperty,
     UniqueIdProperty,
     Relationship
 )
@@ -9,8 +8,10 @@ from neomodel import (
 
 class Location(StructuredNode):
     location_id = UniqueIdProperty()
-    name = StringProperty(required=True)
-    longitude = FloatProperty(required=True)
-    latitude = FloatProperty(required=True)
+    place_name = StringProperty(required=True)
+    street_address = StringProperty(required=True)
+    city = StringProperty(required=True)
+    state = StringProperty(required=True)
+    zip_code = StringProperty(required=True)
 
     customer = Relationship("models.users.Customer", "HAS")

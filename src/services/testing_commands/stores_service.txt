@@ -2,10 +2,10 @@
 curl -X POST "http://localhost:8000/stores_service/$$" -H "Content-Type: application/json" -d '$$'
 
 # Sign up a store with a plain account
-curl -X POST "http://localhost:8000/stores_service/sign_up_store_with_plain_account" -H "Content-Type: application/json" -d '{"email": "gabrielcoronel0303@gmail.com", "password": "hola", "multimedia": ["a", "b"], "name": "store", "description": "a store", "avatar": "avatar"}'
+curl -X POST "http://localhost:8000/stores_service/sign_up_store_with_plain_account" -H "Content-Type: application/json" -d '{"email": "gabrielcoronel0303@gmail.com", "password": "hola", "multimedia": ["a", "b"], "name": "store", "description": "a store", "picture": "blob"}'
 
 # Update a store
-curl -X POST "http://localhost:8000/stores_service/update_store" -H "Content-Type: application/json" -d '{"store_id": <store_id>, "multimedia": ["x", "y"], "name": "new store", "description": "a new store", "avatar": "another avatar"}'
+curl -X POST "http://localhost:8000/stores_service/update_store" -H "Content-Type: application/json" -d '{"store_id": <store_id>, "multimedia": ["x", "y"], "name": "new store", "description": "a new store", "picture": "another blob"}'
 
 # Get a store by ID
 curl -X POST "http://localhost:8000/stores_service/get_store_by_id" -H "Content-Type: application/json" -d '{"store_id": <store_id>}'
