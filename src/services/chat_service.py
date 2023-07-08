@@ -3,6 +3,8 @@ from sanic.exceptions import SanicException
 from models.users import BaseUser
 from models.chat import Chat
 from models.message import Message
+from utilities.events_dispatching import dispatch_event
+from utilities.users import get_user_websocket_connections_ids
 
 chat_service = sanic.Blueprint(
     "ChatService",
@@ -78,7 +80,7 @@ def fetch_chat(sender, receiver):
     return chat
 
 
-@chat_service.post("get_user_chats")
+@chat_service.post("/get_user_chats")
 def get_user_chats(request):
     user_id = request.json["user_id"]
 
@@ -93,7 +95,7 @@ def get_user_chats(request):
     return sanic.json(json)
 
 
-@chat_service.post("get_chat_by_id")
+@chat_service.post("/get_chat_by_id")
 def get_chat_by_id(request):
     chat_id = request.json["chat_id"]
 
@@ -108,7 +110,7 @@ def get_chat_by_id(request):
     return sanic.json(json)
 
 
-@chat_service.post("add_message")
+@chat_service.post("/add_message")
 def add_message(request):
     sender_id = request.json.pop("sender_id")
     receiver_id = request.json.pop("receiver_id")
@@ -121,10 +123,22 @@ def add_message(request):
     message.user.connect(sender)
     chat.messages.connect(message)
 
+    websocket_connections_ids = ([
+        *get_user_websocket_connections_ids(sender),
+        *get_user_websocket_connections_ids(receiver)
+    ])
+
+    dispatch_event(
+        {
+            "type": "chat.message.added"
+        },
+        websocket_connections_ids
+    )
+
     return sanic.empty()
 
 
-@chat_service.post("edit_message")
+@chat_service.post("/edit_message")
 def edit_message(request):
     message_id = request.json["message_id"]
 
@@ -136,14 +150,36 @@ def edit_message(request):
     message.content = request.json["content"]
     message.save()
 
+    user = message.user.single()
+
+    websocket_connections_ids = get_user_websocket_connections_ids(user)
+
+    dispatch_event(
+        {
+            "type": "chat.message.edited"
+        },
+        websocket_connections_ids
+    )
+
     return sanic.empty()
 
 
-@chat_service.post("delete_message")
+@chat_service.post("/delete_message")
 def delete_message(request):
     message_id = request.json["message_id"]
 
     message = Message.nodes.first(message_id=message_id)
+    user = message.user.single()
+
     message.delete()
+
+    websocket_connections_ids = get_user_websocket_connections_ids(user)
+
+    dispatch_event(
+        {
+            "type": "chat.message.deleted"
+        },
+        websocket_connections_ids
+    )
 
     return sanic.empty()
