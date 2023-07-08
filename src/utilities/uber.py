@@ -1,3 +1,4 @@
+from os import getenv
 import datetime
 import requests
 
@@ -88,3 +89,10 @@ class UberDirectClient:
         json = self._do_json_post_request("deliveries", payload)
 
         return json
+
+
+customer_id = getenv("UBER_CUSTOMER_ID")
+client_id = getenv("UBER_CLIENT_ID")
+client_secret = getenv("UBER_CLIENT_SECRET")
+
+client = UberDirectClient(customer_id, client_id, client_secret)
