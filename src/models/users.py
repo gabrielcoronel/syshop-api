@@ -14,6 +14,10 @@ class BaseUser(StructuredNode):
     account = Relationship("models.accounts.BaseAccount", "IDENTIFIES")
     sessions = Relationship("models.session.Session", "HOLDS")
     chats = Relationship("models.chat.Chat", "COMMUNICATES")
+    websocket_connections = Relationship(
+        "models.websocket_connection.WebsocketConnection",
+        "LISTENS"
+    )
 
 
 class Customer(BaseUser):

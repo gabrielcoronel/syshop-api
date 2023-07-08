@@ -1,8 +1,8 @@
 # Base
-curl -X POST "http://localhost:8000/posts_service/$$" -H "Content-Type: application/json" -d '{$$}'
+curl -X POST "http://localhost:8000/posts_service/$$" -H "Content-Type: application/json" -d '$$'
 
 # Create a post
-curl -X POST "http://localhost:8000/posts_service/create_post" -H "Content-Type: application/json" -d '{"multimedia": ["a", "b"], "categories": ["x", "y"], "title": "title", "description": "description", "amount": 1, "price": 1}'
+curl -X POST "http://localhost:8000/posts_service/create_post" -H "Content-Type: application/json" -d '{"multimedia": ["a", "b"], "categories": ["x", "y"], "title": "title", "description": "description", "amount": 1, "price": 1, "store_id": <store_id>}'
 
 # Update a post
 curl -X POST "http://localhost:8000/posts_service/update_post" -H "Content-Type: application/json" -d '{"post_id": <post_id>, "multimedia": ["s", "t"], "categories": ["u", "v", "w"], "title": "no", "description": "no", "price": 2, "amount": 2}'
@@ -13,11 +13,20 @@ curl -X POST "http://localhost:8000/posts_service/delete_post" -H "Content-Type:
 # Get post by id
 curl -X POST "http://localhost:8000/posts_service/get_post_by_id" -H "Content-Type: application/json" -d '{"post_id": <post_id>}'
 
-# Get all posts
+# Like a post
+curl -X POST "http://localhost:8000/posts_service/like_post" -H "Content-Type: application/json" -d '{"customer_id": <customer_id>, "post_id": <post_id>}'
+
+# Get a customer's liked posts
+curl -X POST "http://localhost:8000/posts_service/get_customer_liked_posts" -H "Content-Type: application/json" -d '{"customer_id": <customer_id>}'
+
+# Get a store's posted posts
+curl -X POST "http://localhost:8000/posts_service/get_store_posts" -H "Content-Type: application/json" -d '{"store_id": <store_id>}'
+
+# Get posts from a the stores followed by a customer
+curl -X POST "http://localhost:8000/posts_service/get_posts_from_customer_following_stores" -H "Content-Type: application/json" -d '{"start": 0, "amount": 3, "customer_id": <customer_id>}'
+
+# Search posts by metadata
+curl -X POST "http://localhost:8000/posts_service/search_posts_by_metadata" -H "Content-Type: application/json" -d '{"start": 0, "amount": 3, "searched_text": "n", "categories": [], "sorting_property": "publication_date", "sorting_schema": "descending"}'
+
+# [Testing] Get all posts
 curl -X POST "http://localhost:8000/posts_service/get_all_posts" -H "Content-Type: application/json" -d '{"sort_by": "$$publication_date", "start": 0, "amount": 3}'
-
-# Add a comment
-curl -X POST "http://localhost:8000/posts_service/add_comment" -H "Content-Type: application/json" -d '{"post_id": <post_id>, "text": "text"}'
-
-# Delete a comment
-curl -X POST "http://localhost:8000/posts_service/delete_comment" -H "Content-Type: application/json" -d '{"comment_id": <comment_id>}'

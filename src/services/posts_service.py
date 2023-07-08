@@ -34,7 +34,7 @@ def make_post_json_view(post):
         category.name
         for category in post.categories.all()
     ]
-    like_count = len(post.liking_users.all())
+    like_count = len(post.liking_customers.all())
 
     json = {
         **post.__properties__,
@@ -194,9 +194,9 @@ def get_posts_from_customer_following_stores(request):
     customer_id = request.json["customer_id"]
 
     query = """
-    MATCH (:Customer {user_id: $customer_id})-[:FOLLOWS]->(:Store)-[:POSTED]->(p:Post)
-    RETURN p AS posts
-    ORDER BY publication_date DESC
+    MATCH (:Customer {user_id: $customer_id})-[:FOLLOWS]-(:Store)-[:POSTED]-(p:Post)
+    RETURN DISTINCT p AS posts
+    ORDER BY p.publication_date DESC
     SKIP $start
     LIMIT $amount
     """
@@ -208,10 +208,11 @@ def get_posts_from_customer_following_stores(request):
             "amount": amount,
             "customer_id": customer_id
         },
+        resolve_objects=True
     )
 
     json = [
-        row[0]
+        make_post_json_view(row[0])
         for row in result
     ]
 
@@ -231,13 +232,13 @@ def search_posts_by_metadata(request):
         "ASC" if sorting_schema.lower() == "ascending" else "DESC"
     )
 
-    query = """
+    query = f"""
     MATCH (p:Post)-[:HAS]->(c:Category)
-    WHERE c.name IN $categories
+    WHERE {"c.name IN $categories" if len(categories) > 0 else "TRUE"}
     AND ((p.title CONTAINS $searched_text)
          OR (p.description CONTAINS $searched_text))
-    RETURN p AS posts
-    ORDER BY $sorting_property $sorting_schema_keyword
+    RETURN DISTINCT p AS posts
+    ORDER BY $sorting_property {sorting_schema_keyword}
     SKIP $start
     LIMIT $amount
     """
@@ -250,12 +251,12 @@ def search_posts_by_metadata(request):
             "searched_text": searched_text,
             "categories": categories,
             "sorting_property": sorting_property,
-            "sorting_schema_keyword": sorting_schema_keyword
         },
+        resolve_objects=True
     )
 
     json = [
-        row[0]
+        make_post_json_view(row[0])
         for row in result
     ]
 

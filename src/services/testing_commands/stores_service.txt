@@ -9,3 +9,9 @@ curl -X POST "http://localhost:8000/stores_service/update_store" -H "Content-Typ
 
 # Get a store by ID
 curl -X POST "http://localhost:8000/stores_service/get_store_by_id" -H "Content-Type: application/json" -d '{"store_id": <store_id>}'
+
+# Follow a store
+curl -X POST "http://localhost:8000/stores_service/follow_store" -H "Content-Type: application/json" -d '{"store_id": <store_id>, "customer_id": <customer_id>}'
+
+# Search stores by name
+curl -X POST "http://localhost:8000/stores_service/search_stores_by_name" -H "Content-Type: application/json" -d '{"start": 1, "amount": 2, "search": "t"}'

@@ -1,0 +1,14 @@
+# Base
+curl -X POST "http://localhost:8000/comments_service/$$" -H "Content-Type: application/json" -d '$$'
+
+# Add a comment
+curl -X POST "http://localhost:8000/comments_service/add_comment" -H "Content-Type: application/json" -d '{"user_id": <user_id>, "post_id": <post_id>, "text": "text"}'
+
+# Update a comment
+curl -X POST "http://localhost:8000/comments_service/update_comment" -H "Content-Type: application/json" -d '{"comment_id": <comment_id>, "text": "otro comentario"}'
+
+# Delete a comment
+curl -X POST "http://localhost:8000/comments_service/delete_comment" -H "Content-Type: application/json" -d '{"comment_id": <comment_id>}'
+
+# Get a post's comments
+curl -X POST "http://localhost:8000/comments_service/get_post_comments" -H "Content-Type: application/json" -d '{"post_id": <post_id>}'
