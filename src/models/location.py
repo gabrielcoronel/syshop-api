@@ -14,4 +14,4 @@ class Location(StructuredNode):
     state = StringProperty(required=True)
     zip_code = StringProperty(required=True)
 
-    customer = Relationship("models.users.Customer", "HAS")
+    user = Relationship("models.users.User", "HAS")

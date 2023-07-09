@@ -74,14 +74,6 @@ class UberDirectClient:
             response["expires_in"]
         )
 
-    def get_quote(self, payload):
-        if self.has_access_token_expired():
-            self.refresh_access_token()
-
-        json = self._do_json_post_request("delivery_quotes", payload)
-
-        return json
-
     def create_delivery(self, payload):
         if self.has_access_token_expired():
             self.refresh_access_token()
@@ -96,3 +88,45 @@ client_id = getenv("UBER_CLIENT_ID")
 client_secret = getenv("UBER_CLIENT_SECRET")
 
 client = UberDirectClient(customer_id, client_id, client_secret)
+
+
+def _format_phone_number(raw_phone_number):
+    formatted_phone_number = f"+506{raw_phone_number}"
+
+    return formatted_phone_number
+
+
+def start_uber_delivery(customer, customer_location, store, store_location, sale):
+    payload = {
+        "pickup_address": {
+            "street_address": [store_location.street_address],
+            "city": store_location.city,
+            "state": store_location.state,
+            "zip_code": store_location.zip_code
+        },
+        "pickup_name": store_location.place_name,
+        "pickup_phone_number": _format_phone_number(store.phone_number),
+        "dropoff_name": customer_location.place_name,
+        "dropoff_phone_number": _format_phone_number(customer.phone_number),
+        "dropoff_address": {
+            "street_address": [customer_location.street_address],
+            "city": customer_location.city,
+            "state": customer_location.state,
+            "zip_code": customer_location.zip_code
+        },
+        "manifest_items": [
+            {
+                "quantity": sale.amount
+            }
+        ],
+        "test_specifications": {
+            "robo_courier_specification": {
+                "mode": "auto"
+            }
+        },
+        "undeliverable_action": "leave_at_door"
+    }
+
+    delivery_response = client.create_delivery(payload)
+
+    return delivery_response

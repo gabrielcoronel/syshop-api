@@ -15,7 +15,7 @@ def add_customer_location(request):
     customer = Customer.nodes.first(user_id=customer_id)
     location = Location(**request.json).save()
 
-    location.customer.connect(customer)
+    location.user.connect(customer)
 
     return sanic.empty()
 
