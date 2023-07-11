@@ -1,3 +1,4 @@
 # Cosas por hacer
-- [ ] Implementar Uber en el proyecto
+- [ ] Testear las varas que quedan
+- [ ] Testear las funcionalidades de Uber
 - [ ] Testear las funcionalidades de Google

@@ -1,6 +1,7 @@
-import orjson
-from neomodel import config
 from sanic import Sanic
+from sanic_ext import Extend
+from neomodel import config
+import orjson
 from os import getenv
 from dotenv import load_dotenv
 
@@ -20,6 +21,8 @@ load_dotenv()
 config.DATABASE_URL = getenv("DATABASE_URL")
 
 app = Sanic("App", dumps=orjson.dumps)
+app.config.CORS_ORIGINS = "http://localhost:19006"
+Extend(app)
 
 app.blueprint(posts_service)
 app.blueprint(users_service)

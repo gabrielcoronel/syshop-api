@@ -1,6 +1,7 @@
 from os import getenv
 import datetime
 import requests
+from dotenv import load_dotenv
 
 
 def fetch_access_token_response(client_id, client_secret):
@@ -82,6 +83,8 @@ class UberDirectClient:
 
         return json
 
+
+load_dotenv()
 
 customer_id = getenv("UBER_CUSTOMER_ID")
 client_id = getenv("UBER_CLIENT_ID")
