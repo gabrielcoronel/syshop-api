@@ -6,6 +6,9 @@ def create_session_for_user(user):
 
     session.user.connect(user)
 
-    json = {"token": session.token}
+    json = {
+        "token": session.token,
+        "user_id": user.user_id
+    }
 
     return json
