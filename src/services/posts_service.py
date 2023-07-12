@@ -25,7 +25,7 @@ def fetch_categories(categories_names):
         yield category_or_none
 
 
-def make_post_json_view(post):
+def make_post_json_view(post, customer_id):
     multimedia_items = [
         item.content_bytes
         for item in post.multimedia_items.all()
@@ -36,11 +36,19 @@ def make_post_json_view(post):
     ]
     like_count = len(post.liking_customers.all())
 
+    if customer_id is None:
+        does_customer_like_post = False
+    else:
+        customer = Customer.nodes.first(user_id=customer_id)
+
+        does_customer_like_post = customer.liked_posts.is_connected(post)
+
     json = {
         **post.__properties__,
         "multimedia": multimedia_items,
         "categories": categories,
-        "likes": like_count
+        "likes": like_count,
+        "does_customer_like_post": does_customer_like_post
     }
 
     return json
@@ -144,7 +152,7 @@ def get_customer_liked_posts(request):
     liked_posts = customer.liked_posts.all()
 
     json = [
-        make_post_json_view(post)
+        make_post_json_view(post, customer_id)
         for post in liked_posts
     ]
 
@@ -154,37 +162,38 @@ def get_customer_liked_posts(request):
 @posts_service.post("/get_store_posts")
 def get_store_posts(request):
     store_id = request.json["store_id"]
+    customer_id = request.json.get("customer_id")
 
     store = Store.nodes.first(user_id=store_id)
     posts = store.posts.all()
 
     json = [
-        make_post_json_view(post)
+        make_post_json_view(post, customer_id)
         for post in posts
     ]
 
     return sanic.json(json)
 
 
-@posts_service.post("/get_all_posts")
-def get_all_posts(request):
-    """
-    Este endpoint es principalmente para pruebas.
-    En producción no tiene mucho uso.
-    """
-
-    start = request.json["start"]
-    amount = request.json["amount"]
-    sorting_property = request.json["sort_by"]
-
-    posts = Post.nodes.order_by(sorting_property)[start:amount]
-
-    json = [
-        make_post_json_view(post)
-        for post in posts
-    ]
-
-    return sanic.json(json)
+# @posts_service.post("/get_all_posts")
+# def get_all_posts(request):
+#     """
+#     Este endpoint es principalmente para pruebas.
+#     En producción no tiene mucho uso.
+#     """
+# 
+#     start = request.json["start"]
+#     amount = request.json["amount"]
+#     sorting_property = request.json["sort_by"]
+# 
+#     posts = Post.nodes.order_by(sorting_property)[start:amount]
+# 
+#     json = [
+#         make_post_json_view(post)
+#         for post in posts
+#     ]
+# 
+#     return sanic.json(json)
 
 
 @posts_service.post("/get_posts_from_customer_following_stores")
@@ -212,7 +221,7 @@ def get_posts_from_customer_following_stores(request):
     )
 
     json = [
-        make_post_json_view(row[0])
+        make_post_json_view(row[0], customer_id)
         for row in result
     ]
 
@@ -227,6 +236,7 @@ def search_posts_by_metadata(request):
     categories = request.json["categories"]
     sorting_property = request.json["sorting_property"]
     sorting_schema = request.json["sorting_schema"]
+    customer_id = request.json.get("customer_id")
 
     sorting_schema_keyword = (
         "ASC" if sorting_schema.lower() == "ascending" else "DESC"
@@ -256,7 +266,7 @@ def search_posts_by_metadata(request):
     )
 
     json = [
-        make_post_json_view(row[0])
+        make_post_json_view(row[0], customer_id)
         for row in result
     ]
 
