@@ -4,7 +4,6 @@ from models.users import Customer
 from utilities.sessions import create_session_for_user
 from utilities.accounts import create_plain_account, fetch_google_account
 from utilities.web import download_file_in_base64, validate_google_id_token
-from utilities.stripe import create_stripe_account
 
 customers_service = sanic.Blueprint(
     "CustomersService",
@@ -28,15 +27,13 @@ def make_customer_from_google_user_information(user_information):
     name = user_information["given_name"]
     picture = download_file_in_base64(picture_url)
     first_surname, second_surname = split_google_raw_surnames(raw_surnames)
-    stripe_account = create_stripe_account()
 
     customer = Customer(
         name=name,
         first_surname=first_surname,
         second_surname=second_surname,
         picture=picture,
-        phone_number=phone_number,
-        stripe_account_id=stripe_account["id"]
+        phone_number=phone_number
     ).save()
 
     return customer
@@ -48,10 +45,8 @@ def sign_up_customer_with_plain_account(request):
     password = request.json.pop("password")
 
     plain_account = create_plain_account(email, password)
-    stripe_account = create_stripe_account()
     customer = Customer(
         **request.json,
-        stripe_account_id=stripe_account["id"]
     ).save()
 
     customer.account.connect(plain_account)

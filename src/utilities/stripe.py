@@ -23,3 +23,12 @@ def create_stripe_account():
     )
 
     return stripe_account
+
+
+def create_payment_intent(stripe_account_id, price):
+    payment_intent = stripe.PaymentIntent.create(
+        amount=price,
+        currency="crc",
+        automatic_payment_methods={"enabled": True},
+        stripe_account=stripe_account_id
+    )

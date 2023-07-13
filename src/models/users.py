@@ -11,7 +11,6 @@ class BaseUser(StructuredNode):
     user_id = UniqueIdProperty()
     picture = StringProperty(required=True)
     phone_number = StringProperty(required=True)
-    stripe_account_id = StringProperty(required=True)
 
     account = Relationship("models.accounts.BaseAccount", "IDENTIFIES")
     sessions = Relationship("models.session.Session", "HOLDS")
@@ -36,6 +35,7 @@ class Customer(BaseUser):
 class Store(BaseUser):
     name = StringProperty(required=True)
     description = StringProperty(required=True)
+    stripe_account_id = StringProperty(unique_index=True, required=True)
 
     multimedia = Relationship("models.store_multimedia_item.StoreMultimediaItem", "HAS")
     sales = Relationship("models.sale.Sale", "SOLD")

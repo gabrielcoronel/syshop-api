@@ -1,5 +1,6 @@
 from neomodel import (
     StructuredNode,
+    StringProperty,
     IntegerProperty,
     DateTimeProperty,
     UniqueIdProperty,
@@ -9,8 +10,10 @@ from neomodel import (
 
 class Sale(StructuredNode):
     sale_id = UniqueIdProperty()
-    sale_date = DateTimeProperty(required=True)
     amount = IntegerProperty(required=True)
+    purchase_date = DateTimeProperty(required=False)
+    stripe_payment_intent_id = StringProperty(unique_index=True, required=True)
 
     post = Relationship("models.sale.Sale", "SOLD")
     delivery = Relationship("models.delivery.Delivery", "DELIVERS")
+    customer = Relationship("models.users.Customer", "BOUGHT")
