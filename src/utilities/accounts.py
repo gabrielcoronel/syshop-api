@@ -1,5 +1,5 @@
 from sanic.exceptions import SanicException
-from models.accounts import PlainAccount
+from models.accounts import GoogleAccount, PlainAccount
 from validate_email import validate_email
 from utilities.encryption import encrypt
 

@@ -11,6 +11,7 @@ class BaseUser(StructuredNode):
     user_id = UniqueIdProperty()
     picture = StringProperty(required=True)
     phone_number = StringProperty(required=True)
+    stripe_account_id = StringProperty(required=True)
 
     account = Relationship("models.accounts.BaseAccount", "IDENTIFIES")
     sessions = Relationship("models.session.Session", "HOLDS")
