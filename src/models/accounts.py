@@ -20,4 +20,4 @@ class PlainAccount(BaseAccount):
 
 
 class GoogleAccount(BaseAccount):
-    google_unique_identifier = StringProperty(required=True)
+    google_unique_identifier = StringProperty(unique_index=True, required=True)

@@ -62,14 +62,7 @@ def sign_up_customer_with_plain_account(request):
 
 @customers_service.post("/sign_on_customer_with_google_account")
 def sign_on_customer_with_google_account(request):
-    google_id_token = request.json["token"]
-
-    (user_information, is_user_information_valid) = validate_google_id_token(
-        google_id_token
-    )
-
-    if not is_user_information_valid:
-        raise SanicException("Google ID token is invalid")
+    user_information = request.json
 
     google_account = fetch_google_account(user_information)
 
