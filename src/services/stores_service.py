@@ -33,6 +33,7 @@ def make_store_from_google_user_information(user_information):
         name=name,
         description="",
         picture=picture,
+        phone_number=phone_number,
         stripe_account_id=stripe_account["id"]
     ).save()
 
@@ -63,14 +64,9 @@ def sign_up_store_with_plain_account(request):
 
 @stores_service.post("/sign_on_store_with_google_account")
 def sign_on_store_with_google_account(request):
-    google_id_token = request.json["token"]
-
-    (user_information, is_user_information_valid) = validate_google_id_token(
-        google_id_token
-    )
-
-    if not is_user_information_valid:
-        raise SanicException("Google ID token is invalid")
+    user_information = request.json
+    # Este payload tiene que incluir el número telefónico del usuario,
+    # este se tiene que recolectar manualmente ya que Google no lo almacena
 
     google_account = fetch_google_account(user_information)
 

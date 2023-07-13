@@ -35,6 +35,7 @@ def make_customer_from_google_user_information(user_information):
         first_surname=first_surname,
         second_surname=second_surname,
         picture=picture,
+        phone_number=phone_number,
         stripe_account_id=stripe_account["id"]
     ).save()
 
@@ -63,6 +64,8 @@ def sign_up_customer_with_plain_account(request):
 @customers_service.post("/sign_on_customer_with_google_account")
 def sign_on_customer_with_google_account(request):
     user_information = request.json
+    # Este payload tiene que incluir el número telefónico del usuario,
+    # este se tiene que recolectar manualmente ya que Google no lo almacena
 
     google_account = fetch_google_account(user_information)
 
