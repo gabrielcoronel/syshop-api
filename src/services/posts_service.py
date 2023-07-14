@@ -26,6 +26,7 @@ def fetch_categories(categories_names):
 
 
 def make_post_json_view(post, customer_id):
+    store_name = post.store.single().name
     multimedia_items = [
         item.content_bytes
         for item in post.multimedia_items.all()
@@ -45,6 +46,7 @@ def make_post_json_view(post, customer_id):
 
     json = {
         **post.__properties__,
+        "store_name": store_name,
         "multimedia": multimedia_items,
         "categories": categories,
         "likes": like_count,
