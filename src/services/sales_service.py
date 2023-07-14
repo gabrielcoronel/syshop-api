@@ -78,6 +78,26 @@ def get_customer_purchases(request):
     return sanic.json(json)
 
 
+@sales_service.post("/get_customer_undelivered_purchases")
+def get_customer_undelivered_purchases(request):
+    customer_id = request.json["customer_id"]
+
+    customer = Customer.nodes.first(user_id=customer_id)
+    purchases = customer.purchases.all()
+    undelivered_purchases = [
+        purchase
+        for purchase in purchases
+        if purchase.delivery.single() is None
+    ]
+
+    json = [
+        make_sale_json_view(purchase)
+        for purchase in undelivered_purchases
+    ]
+
+    return sanic.json(json)
+
+
 @sales_service.post("/get_store_sales")
 def get_store_sales(request):
     store_id = request.json["store_id"]
