@@ -3,7 +3,7 @@ from sanic.exceptions import SanicException
 from models.users import BaseUser
 from models.chat import Chat
 from models.message import Message
-from utilities.events_dispatching import dispatch_event
+from utilities.event_dispatching import dispatch_event
 from utilities.users import get_user_websocket_connections_ids
 
 chat_service = sanic.Blueprint(

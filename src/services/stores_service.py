@@ -4,7 +4,7 @@ from models.users import Store, Customer
 from models.store_multimedia_item import StoreMultimediaItem
 from utilities.sessions import create_session_for_user
 from utilities.accounts import create_plain_account, fetch_google_account
-from utilities.web import download_file_in_base64, validate_google_id_token
+from utilities.web import download_file_in_base64
 from utilities.stripe import create_stripe_account
 
 stores_service = sanic.Blueprint(

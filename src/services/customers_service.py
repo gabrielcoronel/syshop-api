@@ -3,7 +3,7 @@ from sanic.exceptions import SanicException
 from models.users import Customer
 from utilities.sessions import create_session_for_user
 from utilities.accounts import create_plain_account, fetch_google_account
-from utilities.web import download_file_in_base64, validate_google_id_token
+from utilities.web import download_file_in_base64
 
 customers_service = sanic.Blueprint(
     "CustomersService",
@@ -23,6 +23,7 @@ def split_google_raw_surnames(raw_surnames):
 def make_customer_from_google_user_information(user_information):
     picture_url = user_information["picture"]
     raw_surnames = user_information["family_name"]
+    phone_number = user_information["phone_number"]
 
     name = user_information["given_name"]
     picture = download_file_in_base64(picture_url)
@@ -64,11 +65,11 @@ def sign_on_customer_with_google_account(request):
 
     google_account = fetch_google_account(user_information)
 
-    if not google_account.user:
+    if google_account.user.single() is None:
         customer = make_customer_from_google_user_information(user_information)
         customer.account.connect(google_account)
     else:
-        customer = google_account.user
+        customer = google_account.user.single()
 
     json = create_session_for_user(customer)
 

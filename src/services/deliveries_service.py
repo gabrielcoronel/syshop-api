@@ -10,7 +10,7 @@ from models.users import Store, Customer
 from models.location import Location
 from models.delivery import Delivery
 from utilities.uber import start_uber_delivery
-from utilities.events_dispatching import dispatch_event
+from utilities.event_dispatching import dispatch_event
 
 deliveries_service = sanic.Blueprint(
     "DeliveryService",

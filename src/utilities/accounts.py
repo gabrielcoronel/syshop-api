@@ -30,10 +30,10 @@ def create_plain_account(email, password):
 
 
 def fetch_google_account(user_information):
-    google_unique_identifier = user_information["sub"]
+    google_unique_identifier = user_information["id"]
 
     google_account = GoogleAccount.get_or_create({
         "google_unique_identifier": google_unique_identifier
-    })
+    })[0]
 
     return google_account
