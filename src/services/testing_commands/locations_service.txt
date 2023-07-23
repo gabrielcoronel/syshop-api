@@ -1,0 +1,14 @@
+# Base
+curl -X POST "http://localhost:8000/locations_service/$$" -H "Content-Type: application/json" -d '{$$}'
+
+# Añadir un domicilio para un comprador
+curl -X POST "http://localhost:8000/locations_service/add_customer_location" -H "Content-Type: application/json" -d '{"customer_id": <customer_id>, "place_name": "Condominio La Constancia", "street_address": "San Antonio", "city": "Desamparados", "state": "San José", "zip_code": "10305"}'
+
+# Obtener los domiciolios de un comprador
+curl -X POST "http://localhost:8000/locations_service/get_customer_locations" -H "Content-Type: application/json" -d '{"customer_id": <customer_id>}'
+
+# Actualizar un domiciolio de un comprador
+curl -X POST "http://localhost:8000/locations_service/update_customer_location" -H "Content-Type: application/json" -d '{"location_id": <location_id>, "place_name": "Residencial Boulevar", "street_address": "San Antonio", "city": "Desamparados", "state": "San José", "zip_code": "10305"}'
+
+# Eliminar un domicilio de un comprador
+curl -X POST "http://localhost:8000/locations_service/remove_customer_location" -H "Content-Type: application/json" -d '{"location_id": <location_id>}'

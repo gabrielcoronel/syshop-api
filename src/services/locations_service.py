@@ -51,11 +51,11 @@ def update_customer_location(request):
 
     location = Location.nodes.first(location_id=location_id)
 
-    location.place_name = ["place_name"]
-    location.street_address = ["street_address"]
-    location.city = ["city"]
-    location.state = ["state"]
-    location.zip_code = ["zip_code"]
+    location.place_name = request.json["place_name"]
+    location.street_address = request.json["street_address"]
+    location.city = request.json["city"]
+    location.state = request.json["state"]
+    location.zip_code = request.json["zip_code"]
 
     location.save()
 
