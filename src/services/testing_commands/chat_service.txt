@@ -1,0 +1,17 @@
+# Base
+curl -X POST "http://localhost:8000/chat_service/$$" -H "Content-Type: application/json" -d '{$$}'
+
+# Get user chats
+curl -X POST "http://localhost:8000/chat_service/get_user_chats" -H "Content-Type: application/json" -d '{"user_id": <user_id>}'
+
+# Get chat by id
+curl -X POST "http://localhost:8000/chat_service/get_chat_by_id" -H "Content-Type: application/json" -d '{"chat_id": <chat_id>}'
+
+# Añadir un mensaje a un chat (crear un nuevo chat, si es necesario)
+curl -X POST "http://localhost:8000/chat_service/add_message" -H "Content-Type: application/json" -d '{"sender_id": <sender_id>, "receiver_id": <receiver_id>, "content_type": "text", "content": "hola"}'
+
+# Editar un mensaje
+curl -X POST "http://localhost:8000/chat_service/edit_message" -H "Content-Type: application/json" -d '{"message_id": <message_id>, "content": "nuevo"}'
+
+# Eliminar un mensaje
+curl -X POST "http://localhost:8000/chat_service/delete_message" -H "Content-Type: application/json" -d '{"message_id": <message_id>}'

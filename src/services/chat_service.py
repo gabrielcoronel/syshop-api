@@ -1,4 +1,5 @@
 import sanic
+from neomodel import db
 from sanic.exceptions import SanicException
 from models.users import BaseUser
 from models.chat import Chat
@@ -39,6 +40,7 @@ def make_chat_json_view(chat, user):
     last_message = get_chat_messages(chat)[0]
 
     json = {
+        **chat.__properties__,
         "picture": receiving_user.picture,
         "user_name": format_user_name(receiving_user),
         "last_message_sent": last_message.sent_datetime,
@@ -63,19 +65,30 @@ def make_message_json_view(message):
 
 
 def fetch_chat(sender, receiver):
-    matched_chats = [
-        chat
-        for chat in sender.chats.all()
-        if (chat.first_user.single().user_id == receiver.user_id)
-        or (chat.second_user.single().user_id == receiver.user_id)
-    ]
+    query = """
+    MATCH (s:BaseUser {user_id: $sender_id})-[:COMMUNICATES]-(c:Chat)
+    MATCH (c)-[:COMMUNICATES]-(r:BaseUser {user_id: $receiver_id})
+    WHERE s.user_id <> r.user_id
+    RETURN c AS chat
+    LIMIT 1
+    """
 
-    if len(matched_chats) == 0:
+    result, _ = db.cypher_query(
+        query,
+        {
+            "sender_id": sender.user_id,
+            "receiver_id": receiver.user_id,
+        },
+        resolve_objects=True
+    )
+
+    if len(result) == 0:
         chat = Chat().save()
+
         chat.first_user.connect(sender)
         chat.second_user.connect(receiver)
     else:
-        chat = matched_chats[0]
+        chat = result[0][0]
 
     return chat
 
@@ -83,9 +96,12 @@ def fetch_chat(sender, receiver):
 @chat_service.post("/get_user_chats")
 def get_user_chats(request):
     user_id = request.json["user_id"]
+    print(user_id)
 
     user = BaseUser.nodes.first(user_id=user_id)
+    print(user)
     chats = user.chats.all()
+    print(user.chats)
 
     json = [
         make_chat_json_view(chat, user)
