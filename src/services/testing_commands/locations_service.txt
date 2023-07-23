@@ -12,3 +12,6 @@ curl -X POST "http://localhost:8000/locations_service/update_customer_location" 
 
 # Eliminar un domicilio de un comprador
 curl -X POST "http://localhost:8000/locations_service/remove_customer_location" -H "Content-Type: application/json" -d '{"location_id": <location_id>}'
+
+# Actualizar la ubicación de una tienda
+curl -X POST "http://localhost:8000/locations_service/update_store_location" -H "Content-Type: application/json" -d '{"store_id": <store_id>, "place_name": "Mas x Menos", "street_address": "San Antonio", "city": "Desamparados", "state": "San José", "zip_code": "10305"}'

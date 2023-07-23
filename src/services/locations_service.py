@@ -79,21 +79,14 @@ def update_store_location(request):
     store_id = request.json.pop("store_id")
 
     store = Store.nodes.first(user_id=store_id)
-    old_location_or_none = store.location.single()
+    location = store.location.single()
 
-    if old_location_or_none is not None:
-        old_location_or_none.place_name = ["place_name"]
-        old_location_or_none.street_address = ["street_address"]
-        old_location_or_none.city = ["city"]
-        old_location_or_none.state = ["state"]
-        old_location_or_none.zip_code = ["zip_code"]
+    location.place_name = request.json["place_name"]
+    location.street_address = request.json["street_address"]
+    location.city = request.json["city"]
+    location.state = request.json["state"]
+    location.zip_code = request.json["zip_code"]
 
-        old_location_or_none.save()
-
-        return sanic.empty()
-
-    new_location = Location(**request.json).save()
-
-    store.location.connect(new_location)
+    location.save()
 
     return sanic.empty()

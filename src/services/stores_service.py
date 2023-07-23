@@ -1,6 +1,7 @@
 import sanic
 from sanic.exceptions import SanicException
 from models.users import Store, Customer
+from models.location import Location
 from models.store_multimedia_item import StoreMultimediaItem
 from utilities.sessions import create_session_for_user
 from utilities.accounts import create_plain_account, fetch_google_account
@@ -26,6 +27,7 @@ def make_store_from_google_user_information(user_information):
     picture_url = user_information["picture"]
 
     name = user_information["given_name"]
+    phone_number = user_information["phone_number"]
     picture = download_file_in_base64(picture_url)
     stripe_account = create_stripe_account()
 
@@ -49,11 +51,18 @@ def sign_up_store_with_plain_account(request):
     plain_account = create_plain_account(email, password)
     stripe_account = create_stripe_account()
     store = Store(
-        **request.json,
+        name=request.json.pop("name"),
+        description=request.json.pop("description"),
+        picture=request.json.pop("picture"),
+        phone_number=request.json.pop("phone_number"),
         stripe_account_id=stripe_account["id"]
+    ).save()
+    location = Location(
+        **request.json
     ).save()
 
     store.account.connect(plain_account)
+    store.location.connect(location)
 
     create_store_multimedia_items(store, multimedia_items)
 
@@ -64,15 +73,19 @@ def sign_up_store_with_plain_account(request):
 
 @stores_service.post("/sign_on_store_with_google_account")
 def sign_on_store_with_google_account(request):
-    user_information = request.json
-    # Este payload tiene que incluir el número telefónico del usuario,
-    # este se tiene que recolectar manualmente ya que Google no lo almacena
+    # user_information tiene que incluir un número de teléfono,
+    # esto es responsabilidad del cliente
+    user_information = request.json["user_information"]
+    store_location = request.json["location"]
 
     google_account = fetch_google_account(user_information)
 
     if not google_account.user:
         store = make_store_from_google_user_information(user_information)
+        location = Location(**store_location).save()
+
         store.account.connect(google_account)
+        store.location.connect(location)
     else:
         store = google_account.user
 

@@ -23,9 +23,9 @@ def split_google_raw_surnames(raw_surnames):
 def make_customer_from_google_user_information(user_information):
     picture_url = user_information["picture"]
     raw_surnames = user_information["family_name"]
-    phone_number = user_information["phone_number"]
 
     name = user_information["given_name"]
+    phone_number = user_information["phone_number"]
     picture = download_file_in_base64(picture_url)
     first_surname, second_surname = split_google_raw_surnames(raw_surnames)
 
@@ -59,9 +59,9 @@ def sign_up_customer_with_plain_account(request):
 
 @customers_service.post("/sign_on_customer_with_google_account")
 def sign_on_customer_with_google_account(request):
-    user_information = request.json
     # Este payload tiene que incluir el número telefónico del usuario,
     # este se tiene que recolectar manualmente ya que Google no lo almacena
+    user_information = request.json
 
     google_account = fetch_google_account(user_information)
 
