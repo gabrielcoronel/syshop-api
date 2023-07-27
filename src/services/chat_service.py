@@ -26,7 +26,7 @@ def format_user_name(user):
 
 
 def get_chat_messages(chat):
-    messages = chat.messages.order_by("-sent_datetime")
+    messages = chat.messages.order_by("-sent_datetime")[start:amount]
 
     return messages
 
@@ -58,7 +58,7 @@ def make_message_json_view(message):
 
     json = {
         **message.__properties__,
-        "user_name": user_name
+        "user_id": user.user_id
     }
 
     return json
@@ -114,9 +114,11 @@ def get_user_chats(request):
 @chat_service.post("/get_chat_by_id")
 def get_chat_by_id(request):
     chat_id = request.json["chat_id"]
+    start = request.json["start"]
+    amount = request.json["amount"]
 
     chat = Chat.nodes.first(chat_id=chat_id)
-    messages = get_chat_messages(chat)
+    messages = get_chat_messages(chat, start, amount)
 
     json = [
         make_message_json_view(message)
