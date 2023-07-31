@@ -25,9 +25,9 @@ def make_delivery_json_view(delivery):
 
     json = {
         **delivery.__properties__,
-        **post.__properties__,
-        **sale.__properties__,
-        **location.__properties__
+        "post": post.__properties__,
+        "sale": sale.__properties__,
+        "location": location.__properties__
     }
 
     return json

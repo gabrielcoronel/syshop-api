@@ -31,6 +31,33 @@ def get_chat_messages(chat):
     return messages
 
 
+def fetch_user_chats(user, start, amount):
+    query = """
+    MATCH (:BaseUser {user_id: $user_id})-[:COMMUNICATES]-(c:Chat)-[:HAS]-(m:Message)
+    RETURN c AS chat
+    ORDER BY m.sent_datetime
+    SKIP $start
+    LIMIT $amount
+    """
+
+    result, _ = db.cypher_query(
+        query,
+        {
+            "user_id": user.user_id,
+            "start": start,
+            "amount": amount
+        },
+        resolve_objects=True
+    )
+
+    chats = [
+        row[0]
+        for row in result
+    ]
+
+    return chats
+
+
 def make_chat_json_view(chat, user):
     if chat.first_user.single().user_id == user.user_id:
         receiving_user = chat.second_user.single()
@@ -41,11 +68,11 @@ def make_chat_json_view(chat, user):
 
     json = {
         **chat.__properties__,
-        "picture": receiving_user.picture,
-        "user_name": format_user_name(receiving_user),
-        "last_message_sent": last_message.sent_datetime,
-        "last_message_content_type": last_message.content_type,
-        "last_message_content": last_message.content
+        "user": {
+            "picture": receiving_user.picture,
+            "name": format_user_name(receiving_user)
+        },
+        "last_message": last_message.__properties__
     }
 
     return json
@@ -95,13 +122,12 @@ def fetch_chat(sender, receiver):
 
 @chat_service.post("/get_user_chats")
 def get_user_chats(request):
+    start = request.json["start"]
+    amount = request.json["amount"]
     user_id = request.json["user_id"]
-    print(user_id)
 
     user = BaseUser.nodes.first(user_id=user_id)
-    print(user)
-    chats = user.chats.all()
-    print(user.chats)
+    chats = fetch_user_chats(user, start, amount)
 
     json = [
         make_chat_json_view(chat, user)
