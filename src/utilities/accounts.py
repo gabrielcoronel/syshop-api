@@ -29,11 +29,9 @@ def create_plain_account(email, password):
     return plain_account
 
 
-def fetch_google_account(user_information):
-    google_unique_identifier = user_information["id"]
+def does_google_account_exist(google_unique_identifier):
+    existing_google_account_or_none = GoogleAccount.nodes.first_or_one(
+        google_unique_identifier=google_unique_identifier
+    )
 
-    google_account = GoogleAccount.get_or_create({
-        "google_unique_identifier": google_unique_identifier
-    })[0]
-
-    return google_account
+    return existing_google_account_or_none is not None

@@ -1,8 +1,9 @@
 import sanic
 from sanic.exceptions import SanicException
 from models.users import Customer
+from models.accounts import GoogleAccount
 from utilities.sessions import create_session_for_user
-from utilities.accounts import create_plain_account, fetch_google_account
+from utilities.accounts import create_plain_account, does_google_account_exist
 from utilities.web import download_file_in_base64
 
 customers_service = sanic.Blueprint(
@@ -46,9 +47,7 @@ def sign_up_customer_with_plain_account(request):
     password = request.json.pop("password")
 
     plain_account = create_plain_account(email, password)
-    customer = Customer(
-        **request.json,
-    ).save()
+    customer = Customer(**request.json).save()
 
     customer.account.connect(plain_account)
 
@@ -57,19 +56,19 @@ def sign_up_customer_with_plain_account(request):
     return sanic.json(json)
 
 
-@customers_service.post("/sign_on_customer_with_google_account")
-def sign_on_customer_with_google_account(request):
-    # Este payload tiene que incluir el número telefónico del usuario,
-    # este se tiene que recolectar manualmente ya que Google no lo almacena
-    user_information = request.json
+@customers_service.post("/sign_up_customer_with_google_account")
+def sign_up_customer_with_google_account(request):
+    google_unique_identifier = request.json.pop("google_unique_identifier")
 
-    google_account = fetch_google_account(user_information)
+    if does_google_account_exist(google_unique_identifier)
+        raise SanicException("GOOGLE_ACCOUNT_ALREADY_EXISTS")
 
-    if google_account.user.single() is None:
-        customer = make_customer_from_google_user_information(user_information)
-        customer.account.connect(google_account)
-    else:
-        customer = google_account.user.single()
+    customer = Customer(**request.json).save()
+    google_account = GoogleAccount(
+        google_unique_identifier=google_unique_identifier
+    )
+
+    customer.account.connect(google_account)
 
     json = create_session_for_user(customer)
 

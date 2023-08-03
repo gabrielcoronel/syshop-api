@@ -1,10 +1,11 @@
 import sanic
 from sanic.exceptions import SanicException
 from models.users import Store, Customer
+from models.accounts import GoogleAccount
 from models.location import Location
 from models.store_multimedia_item import StoreMultimediaItem
 from utilities.sessions import create_session_for_user
-from utilities.accounts import create_plain_account, fetch_google_account
+from utilities.accounts import create_plain_account, does_google_account_exist
 from utilities.web import download_file_in_base64
 from utilities.stripe import create_stripe_account
 
@@ -21,6 +22,21 @@ def create_store_multimedia_items(store, content_bytes_list):
         ).save()
 
         store.multimedia.connect(store_multimedia_item)
+
+
+def create_store(store, location, multimedia_items):
+    stripe_account = create_stripe_account()
+    stored_location = Location(**location).save()
+    stored_store = Store(
+        **store,
+        stripe_account_id=stripe_account["id"]
+    ).save()
+
+    stored_store.location.connect(stored_location)
+
+    create_store_multimedia_items(stored_store, multimedia_items)
+
+    return store
 
 
 def make_store_from_google_user_information(user_information):
@@ -47,47 +63,41 @@ def sign_up_store_with_plain_account(request):
     email = request.json.pop("email")
     password = request.json.pop("password")
     multimedia_items = request.json.pop("multimedia")
+    store_location = request.json.pop("location")
 
     plain_account = create_plain_account(email, password)
-    stripe_account = create_stripe_account()
-    store = Store(
-        name=request.json.pop("name"),
-        description=request.json.pop("description"),
-        picture=request.json.pop("picture"),
-        phone_number=request.json.pop("phone_number"),
-        stripe_account_id=stripe_account["id"]
-    ).save()
-    location = Location(
-        **request.json
-    ).save()
+    store = create_store(
+        store=request.json,
+        location=store_location,
+        multimedia_items=multimedia_items
+    )
 
     store.account.connect(plain_account)
-    store.location.connect(location)
-
-    create_store_multimedia_items(store, multimedia_items)
 
     json = create_session_for_user(store)
 
     return sanic.json(json)
 
 
-@stores_service.post("/sign_on_store_with_google_account")
-def sign_on_store_with_google_account(request):
-    # user_information tiene que incluir un número de teléfono,
-    # esto es responsabilidad del cliente
-    user_information = request.json["user_information"]
-    store_location = request.json["location"]
+@stores_service.post("/sign_up_store_with_google_account")
+def sign_up_store_with_google_account(request):
+    google_unique_identifier = request.json.pop("google_unique_identifier")
+    store_location = request.json.pop("location")
+    multimedia_items = request.json.pop("multimedia")
 
-    google_account = fetch_google_account(user_information)
+    if does_google_account_exist(google_unique_identifier):
+        raise SanicException("GOOGLE_ACCOUNT_ALREADY_EXISTS")
 
-    if not google_account.user:
-        store = make_store_from_google_user_information(user_information)
-        location = Location(**store_location).save()
+    store = create_store(
+        store=request.json,
+        location=store_location,
+        multimedia_items=multimedia_items
+    )
+    google_account = GoogleAccount(
+        google_unique_identifier=google_unique_identifier
+    )
 
-        store.account.connect(google_account)
-        store.location.connect(location)
-    else:
-        store = google_account.user
+    store.account.connect(google_account)
 
     json = create_session_for_user(store)
 

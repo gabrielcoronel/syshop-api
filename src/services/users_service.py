@@ -1,6 +1,6 @@
 import sanic
 from sanic.exceptions import SanicException
-from models.accounts import PlainAccount
+from models.accounts import PlainAccount, GoogleAccount
 from models.users import BaseUser
 from models.session import Session
 from utilities.encryption import encrypt, decrypt
@@ -41,6 +41,20 @@ def sign_in_user_with_plain_account(request):
         raise SanicException("Incorrect password")
 
     user = plain_account.user.single()
+
+    json = create_session_for_user(user)
+
+    return sanic.json(json)
+
+@users_service.post("/sign_in_user_with_google_account")
+def sign_in_user_with_google_account(request):
+    google_unique_identifier = request.json["google_unique_identifier"]
+
+    google_account = GoogleAccount.nodes.first(
+        google_unique_identifier=google_unique_identifier
+    )
+
+    user = google_account.user.single()
 
     json = create_session_for_user(user)
 
