@@ -61,7 +61,8 @@ def make_chat_json_view(chat, user):
         **chat.__properties__,
         "user": {
             "picture": receiving_user.picture,
-            "name": format_user_name(receiving_user)
+            "name": format_user_name(receiving_user),
+            "user_id": receiving_user.user_id
         },
         "last_message": last_message.__properties__
     }
