@@ -2,11 +2,24 @@ import sanic
 from models.comment import Comment
 from models.users import BaseUser
 from models.post import Post
+from utilities.users import format_user_name
 
 comments_service = sanic.Blueprint(
     "CommentsService",
     url_prefix="/comments_service"
 )
+
+
+def make_comment_json_view(comment):
+    user = comment.user.single()
+
+    json = {
+        **comment.__properties__,
+        "user_name": format_user_name(user),
+        "user_picture": user.picture
+    }
+
+    return json
 
 
 @comments_service.post("/add_comment")
@@ -49,13 +62,15 @@ def delete_comment(request):
 
 @comments_service.post("/get_post_comments")
 def get_post_comments(request):
+    start = request.json["start"]
+    amount = request.json["amount"]
     post_id = request.json["post_id"]
 
     post = Post.nodes.first(post_id=post_id)
-    comments = post.comments.all()
+    comments = post.comments.all()[start:amount]
 
     json = [
-        comment.__properties__
+        make_comment_json_view(comment)
         for comment in comments
     ]
 

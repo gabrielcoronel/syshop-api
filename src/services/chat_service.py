@@ -5,24 +5,15 @@ from models.users import BaseUser
 from models.chat import Chat
 from models.message import Message
 from utilities.event_dispatching import dispatch_event
-from utilities.users import get_user_websocket_connections_ids
+from utilities.users import (
+    get_user_websocket_connections_ids,
+    format_user_name
+)
 
 chat_service = sanic.Blueprint(
     "ChatService",
     url_prefix="/chat_service"
 )
-
-
-def format_user_name(user):
-    user_type = user.__class__.__name__
-
-    match user_type:
-        case "Customer":
-            return f"{user.name} {user.first_surname} {user.second_surname}"
-        case "Store":
-            return user.name
-        case _:
-            raise ValueError("Estado inválido: esto es culpa del programador")
 
 
 def get_chat_messages(chat):

@@ -6,3 +6,15 @@ def get_user_websocket_connections_ids(user):
     ]
 
     return connections_ids
+
+
+def format_user_name(user):
+    user_type = user.__class__.__name__
+
+    match user_type:
+        case "Customer":
+            return f"{user.name} {user.first_surname} {user.second_surname}"
+        case "Store":
+            return user.name
+        case _:
+            raise ValueError("Estado inválido: esto es culpa del programador")
