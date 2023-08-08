@@ -60,7 +60,7 @@ def sign_up_customer_with_plain_account(request):
 def sign_up_customer_with_google_account(request):
     google_unique_identifier = request.json.pop("google_unique_identifier")
 
-    if does_google_account_exist(google_unique_identifier)
+    if does_google_account_exist(google_unique_identifier):
         raise SanicException("GOOGLE_ACCOUNT_ALREADY_EXISTS")
 
     customer = Customer(**request.json).save()
