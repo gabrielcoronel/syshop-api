@@ -178,7 +178,7 @@ def get_store_by_id(request):
         "multimedia": multimedia_items,
         "location": location.__properties__,
         "follower_count": follower_count,
-        "does_customer_follow_store": does_customer_follow_store(customer, store)
+        "does_customer_follow_store": does_customer_follow_store(customer, store),
         "account_type": account_type
     }
 
