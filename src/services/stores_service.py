@@ -4,6 +4,7 @@ from models.users import Store, Customer
 from models.accounts import GoogleAccount
 from models.location import Location
 from models.store_multimedia_item import StoreMultimediaItem
+from neomodel import db
 from utilities.sessions import create_session_for_user
 from utilities.accounts import create_plain_account, does_google_account_exist
 from utilities.web import download_file_in_base64
@@ -56,6 +57,24 @@ def make_store_from_google_user_information(user_information):
     ).save()
 
     return store
+
+
+def does_customer_follow_store(customer, store):
+    query = """
+    MATCH (:Customer {user_id: $customer_id})-[r:FOLLOWS]-(:Store {user_id: $store_id})
+    RETURN COUNT(r) > 1
+    """
+
+    result, _ = db.cypher_query(
+        query,
+        {
+            "customer_id": customer.user_id,
+            "store_id": customer.store_id
+        },
+        resolve_objects=True
+    )
+
+    return result[0][0]
 
 
 @stores_service.post("/sign_up_store_with_plain_account")
@@ -142,17 +161,24 @@ def follow_store(request):
 @stores_service.post("/get_store_by_id")
 def get_store_by_id(request):
     store_id = request.json["store_id"]
+    customer_id = request.json["customer_id_id"]
 
     store = Store.nodes.first(user_id=store_id)
+    customer = Customer.nodes.first(user_id=customer_id)
+    location = store.location.single()
     multimedia_items = [
         store_multimedia_item.content_bytes
         for store_multimedia_item in store.multimedia.all()
     ]
+    follower_count = len(store.followers.all())
     account_type = store.account.single().__class__.__name__
 
     json = {
         **store.__properties__,
         "multimedia": multimedia_items,
+        "location": location.__properties__,
+        "follower_count": follower_count,
+        "does_customer_follow_store": does_customer_follow_store(customer, store)
         "account_type": account_type
     }
 

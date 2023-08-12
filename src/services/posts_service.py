@@ -26,7 +26,7 @@ def fetch_categories(categories_names):
 
 
 def make_post_json_view(post, customer_id):
-    store_name = post.store.single().name
+    store = post.store.single()
     multimedia_items = [
         item.content_bytes
         for item in post.multimedia_items.all()
@@ -46,7 +46,8 @@ def make_post_json_view(post, customer_id):
 
     json = {
         **post.__properties__,
-        "store_name": store_name,
+        "store_name": store.name,
+        "store_id": store.store_id,
         "multimedia": multimedia_items,
         "categories": categories,
         "likes": like_count,
@@ -149,9 +150,11 @@ def get_post_by_id(request):
 @posts_service.post("/get_customer_liked_posts")
 def get_customer_liked_posts(request):
     customer_id = request.json["customer_id"]
+    start = request.json["start"]
+    amount = request.json["amount"]
 
     customer = Customer.nodes.first(user_id=customer_id)
-    liked_posts = customer.liked_posts.all()
+    liked_posts = customer.liked_posts.all()[start:amount]
 
     json = [
         make_post_json_view(post, customer_id)
@@ -165,9 +168,11 @@ def get_customer_liked_posts(request):
 def get_store_posts(request):
     store_id = request.json["store_id"]
     customer_id = request.json.get("customer_id")
+    start = request.json["start"]
+    amount = request.json["amount"]
 
     store = Store.nodes.first(user_id=store_id)
-    posts = store.posts.all()
+    posts = store.posts.all()[start:amount]
 
     json = [
         make_post_json_view(post, customer_id)
