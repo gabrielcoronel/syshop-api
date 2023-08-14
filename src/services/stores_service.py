@@ -39,26 +39,6 @@ def create_store(store, location, multimedia_items):
 
     return store
 
-
-def make_store_from_google_user_information(user_information):
-    picture_url = user_information["picture"]
-
-    name = user_information["given_name"]
-    phone_number = user_information["phone_number"]
-    picture = download_file_in_base64(picture_url)
-    stripe_account = create_stripe_account()
-
-    store = Store(
-        name=name,
-        description="",
-        picture=picture,
-        phone_number=phone_number,
-        stripe_account_id=stripe_account["id"]
-    ).save()
-
-    return store
-
-
 def does_customer_follow_store(customer, store):
     query = """
     MATCH (:Customer {user_id: $customer_id})-[r:FOLLOWS]-(:Store {user_id: $store_id})

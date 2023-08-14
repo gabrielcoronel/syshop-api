@@ -20,27 +20,6 @@ def split_google_raw_surnames(raw_surnames):
 
     return split
 
-
-def make_customer_from_google_user_information(user_information):
-    picture_url = user_information["picture"]
-    raw_surnames = user_information["family_name"]
-
-    name = user_information["given_name"]
-    phone_number = user_information["phone_number"]
-    picture = download_file_in_base64(picture_url)
-    first_surname, second_surname = split_google_raw_surnames(raw_surnames)
-
-    customer = Customer(
-        name=name,
-        first_surname=first_surname,
-        second_surname=second_surname,
-        picture=picture,
-        phone_number=phone_number
-    ).save()
-
-    return customer
-
-
 @customers_service.post("/sign_up_customer_with_plain_account")
 def sign_up_customer_with_plain_account(request):
     email = request.json.pop("email")
@@ -66,7 +45,7 @@ def sign_up_customer_with_google_account(request):
     customer = Customer(**request.json).save()
     google_account = GoogleAccount(
         google_unique_identifier=google_unique_identifier
-    )
+    ).save()
 
     customer.account.connect(google_account)
 

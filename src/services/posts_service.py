@@ -243,6 +243,8 @@ def search_posts_by_metadata(request):
     categories = request.json["categories"]
     sorting_property = request.json["sorting_property"]
     sorting_schema = request.json["sorting_schema"]
+    minimum_price = request.json["minimum_price"]
+    maximum_price = request.json["maximum_price"]
     customer_id = request.json.get("customer_id")
 
     sorting_schema_keyword = (
@@ -254,6 +256,7 @@ def search_posts_by_metadata(request):
     WHERE {"c.name IN $categories" if len(categories) > 0 else "TRUE"}
     AND ((p.title CONTAINS $searched_text)
          OR (p.description CONTAINS $searched_text))
+    AND $minimum_price <= p.price <= $maximum_price
     RETURN DISTINCT p AS posts
     ORDER BY $sorting_property {sorting_schema_keyword}
     SKIP $start
@@ -268,6 +271,8 @@ def search_posts_by_metadata(request):
             "searched_text": searched_text,
             "categories": categories,
             "sorting_property": sorting_property,
+            "minimum_price": minimum_price,
+            "maximum_price": maximum_price
         },
         resolve_objects=True
     )
@@ -278,3 +283,11 @@ def search_posts_by_metadata(request):
     ]
 
     return sanic.json(json)
+
+
+@posts_service.post("/get_maximum_price")
+def get_maximum_price(request):
+    ordered_posts = Post.nodes.order_by("-price")
+    maximum_price = ordered_posts[0].price if len(ordered_posts) > 0 else 0
+
+    return sanic.json(maximum_price)

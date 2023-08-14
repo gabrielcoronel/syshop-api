@@ -30,7 +30,7 @@ def create_plain_account(email, password):
 
 
 def does_google_account_exist(google_unique_identifier):
-    existing_google_account_or_none = GoogleAccount.nodes.first_or_one(
+    existing_google_account_or_none = GoogleAccount.nodes.first_or_none(
         google_unique_identifier=google_unique_identifier
     )
 
