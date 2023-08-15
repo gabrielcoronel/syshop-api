@@ -25,8 +25,9 @@ def get_chat_messages(chat, start, amount):
 def fetch_user_chats(user, start, amount):
     query = """
     MATCH (:BaseUser {user_id: $user_id})-[:COMMUNICATES]-(c:Chat)-[:HAS]-(m:Message)
-    RETURN c AS chat
-    ORDER BY m.sent_datetime
+    WITH c AS chat, m.sent_datetime as datetime
+    ORDER BY datetime
+    RETURN DISTINCT chat
     SKIP $start
     LIMIT $amount
     """
