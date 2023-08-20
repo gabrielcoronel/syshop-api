@@ -76,10 +76,12 @@ def get_customer_by_id(request):
     customer_id = request.json["customer_id"]
 
     customer = Customer.nodes.first(user_id=customer_id)
-    account_type = customer.account.single().__class__.__name__
+    account = customer.account.single()
+    account_type = account.__class__.__name__
 
     json = {
         **customer.__properties__,
+        "email": account.email if account_type == "PlainAccount" else None,
         "account_type": account_type
     }
 
