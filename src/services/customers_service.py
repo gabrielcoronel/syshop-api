@@ -38,11 +38,13 @@ def sign_up_customer_with_plain_account(request):
 @customers_service.post("/sign_up_customer_with_google_account")
 def sign_up_customer_with_google_account(request):
     google_unique_identifier = request.json.pop("google_unique_identifier")
+    google_picture_url = request.json.pop("picture")
 
     if does_google_account_exist(google_unique_identifier):
         raise SanicException("GOOGLE_ACCOUNT_ALREADY_EXISTS")
 
-    customer = Customer(**request.json).save()
+    picture = download_file_in_base64(google_picture_url)
+    customer = Customer(**request.json, picture=picture).save()
     google_account = GoogleAccount(
         google_unique_identifier=google_unique_identifier
     ).save()

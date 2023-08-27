@@ -81,14 +81,19 @@ def sign_up_store_with_plain_account(request):
 @stores_service.post("/sign_up_store_with_google_account")
 def sign_up_store_with_google_account(request):
     google_unique_identifier = request.json.pop("google_unique_identifier")
+    google_picture_url = request.json.pop("picture")
     store_location = request.json.pop("location")
     multimedia_items = request.json.pop("multimedia")
 
     if does_google_account_exist(google_unique_identifier):
         raise SanicException("GOOGLE_ACCOUNT_ALREADY_EXISTS")
 
+    picture = download_file_in_base64(google_picture_url)
     store = create_store(
-        store=request.json,
+        store={
+            **request.json,
+            "picture": picture
+        },
         location=store_location,
         multimedia_items=multimedia_items
     )
