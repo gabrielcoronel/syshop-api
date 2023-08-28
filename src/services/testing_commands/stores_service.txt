@@ -2,7 +2,7 @@
 curl -X POST "http://localhost:8000/stores_service/$$" -H "Content-Type: application/json" -d '$$'
 
 # Sign up a store with a plain account
-curl -X POST "http://localhost:8000/stores_service/sign_up_store_with_plain_account" -H "Content-Type: application/json" -d '{"email": "gabrielcoronel0303@gmail.com", "password": "hola", "multimedia": ["a", "b"], "name": "store", "description": "a store", "picture": "blob", "phone_number": "77777777", "place_name": "Condominio La Constancia", "street_address": "San Antonio", "city": "Desamparados", "state": "San José", "zip_code": "10305"}'
+curl -X POST "http://localhost:8000/stores_service/sign_up_store_with_plain_account" -H "Content-Type: application/json" -d '{"email": "gabrielcoronel0303@gmail.com", "password": "hola", "multimedia": ["a", "b"], "name": "store", "description": "a store", "picture": "blob", "phone_number": "77777777", "location": { "place_name": "Condominio La Constancia", "street_address": "San Antonio", "city": "Desamparados", "state": "San José", "zip_code": "10305" }}'
 
 # Update a store
 curl -X POST "http://localhost:8000/stores_service/update_store" -H "Content-Type: application/json" -d '{"store_id": <store_id>, "multimedia": ["x", "y"], "name": "new store", "description": "a new store", "picture": "another blob", "phone_number": "77777777", "place_name": "Condominio La Constancia", "street_address": "San Antonio", "city": "Desamparados", "state": "San José", "zip_code": "10305"}'

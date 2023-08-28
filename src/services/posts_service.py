@@ -47,7 +47,7 @@ def make_post_json_view(post, customer_id):
     json = {
         **post.__properties__,
         "store_name": store.name,
-        "store_id": store.store_id,
+        "store_id": store.user_id,
         "multimedia": multimedia_items,
         "categories": categories,
         "likes": like_count,
@@ -140,9 +140,10 @@ def delete_post(request):
 @posts_service.post("/get_post_by_id")
 def get_post_by_id(request):
     post_id = request.json["post_id"]
+    customer_id = request.json["customer_id"]
 
     post = Post.nodes.first(post_id=post_id)
-    json = make_post_json_view(post)
+    json = make_post_json_view(post, customer_id)
 
     return sanic.json(json)
 

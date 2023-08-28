@@ -16,7 +16,6 @@ users_service = sanic.Blueprint(
 
 def is_password_correct(plain_account, password):
     stored_password = decrypt(plain_account.password)
-    print(stored_password)
 
     return password == stored_password
 

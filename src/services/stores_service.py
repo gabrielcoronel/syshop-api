@@ -37,7 +37,7 @@ def create_store(store, location, multimedia_items):
 
     create_store_multimedia_items(stored_store, multimedia_items)
 
-    return store
+    return stored_store
 
 def does_customer_follow_store(customer, store):
     query = """
@@ -49,7 +49,7 @@ def does_customer_follow_store(customer, store):
         query,
         {
             "customer_id": customer.user_id,
-            "store_id": customer.store_id
+            "store_id": store.user_id
         },
         resolve_objects=True
     )
@@ -146,7 +146,7 @@ def follow_store(request):
 @stores_service.post("/get_store_by_id")
 def get_store_by_id(request):
     store_id = request.json["store_id"]
-    customer_id = request.json["customer_id_id"]
+    customer_id = request.json["customer_id"]
 
     store = Store.nodes.first(user_id=store_id)
     customer = Customer.nodes.first(user_id=customer_id)
