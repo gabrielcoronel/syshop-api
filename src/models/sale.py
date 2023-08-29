@@ -14,6 +14,6 @@ class Sale(StructuredNode):
     purchase_date = DateTimeProperty(required=False)
     stripe_payment_intent_id = StringProperty(unique_index=True, required=True)
 
-    post = Relationship("models.sale.Sale", "SOLD")
+    post = Relationship("models.post.Post", "SOLD")
     delivery = Relationship("models.delivery.Delivery", "DELIVERS")
     customer = Relationship("models.users.Customer", "BOUGHT")

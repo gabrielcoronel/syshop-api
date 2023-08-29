@@ -46,7 +46,7 @@ def create_sale_intent(request):
     store = post.store.single()
     payment_intent = create_payment_intent(
         stripe_account_id=store.stripe_account_id,
-        price=post.price * amount
+        price=int(400 * 100)
     )
     sale = Sale(
         amount=amount,
@@ -54,6 +54,7 @@ def create_sale_intent(request):
         purchase_date=None
     ).save()
 
+    sale.post.connect(post)
     customer.purchases.connect(sale)
 
     json = {
