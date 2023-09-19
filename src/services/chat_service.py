@@ -147,6 +147,35 @@ def get_chat_by_id(request):
     return sanic.json(json)
 
 
+@chat_service.post("/get_chat_by_sender_and_receiver")
+def get_chat_by_sender_and_receiver(request):
+    sender_id = request.json["sender_id"]
+    receiver_id = request.json["receiver_id"]
+
+    query = """
+    MATCH (:BaseUser {user_id: $sender_id})-[:COMMUNICATES]->(c:Chat)<-[:COMMUNICATES]-(:BaseUser {user_id: $receiver_id})
+    RETURN c AS chat
+    LIMIT 1
+    """
+
+    result, _ = db.cypher_query(
+        query,
+        {
+            "sender_id": sender_id,
+            "receiver_id": receiver_id
+        },
+        resolve_objects=True
+    )
+
+    if len(result) == 0:
+        return sanic.json(None)
+
+    chat = result[0][0]
+    json = chat.__properties__
+
+    return sanic.json(json)
+
+
 @chat_service.post("/add_message")
 def add_message(request):
     sender_id = request.json.pop("sender_id")
