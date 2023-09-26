@@ -88,7 +88,7 @@ def create_delivery(request):
         uber_state=None,
         uber_delivery_id=None,
         uber_tracking_url=None
-    )
+    ).save()
 
     delivery.sale.connect(sale)
     delivery.location.connect(location)

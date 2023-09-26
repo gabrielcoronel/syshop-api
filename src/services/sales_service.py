@@ -58,7 +58,8 @@ def create_sale_intent(request):
     customer.purchases.connect(sale)
 
     json = {
-        "stripe_client_secret": payment_intent.client_secret
+        "stripe_client_secret": payment_intent.client_secret,
+        "sale_id": sale.sale_id
     }
 
     return sanic.json(json)
