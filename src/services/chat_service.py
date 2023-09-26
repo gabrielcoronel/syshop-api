@@ -52,7 +52,7 @@ def make_chat_json_view(chat, user):
     else:
         receiving_user = chat.first_user.single()
 
-    last_message = get_chat_messages(chat, 0, 1)[0]
+    last_message = get_chat_messages(chat)[0]
 
     json = {
         **chat.__properties__,
