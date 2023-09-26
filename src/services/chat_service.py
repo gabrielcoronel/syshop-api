@@ -16,28 +16,24 @@ chat_service = sanic.Blueprint(
 )
 
 
-def get_chat_messages(chat, start, amount):
-    messages = chat.messages.order_by("-sent_datetime")[start:amount]
+def get_chat_messages(chat):
+    messages = chat.messages.order_by("-sent_datetime")
 
     return messages
 
 
-def fetch_user_chats(user, start, amount):
+def fetch_user_chats(user):
     query = """
     MATCH (:BaseUser {user_id: $user_id})-[:COMMUNICATES]-(c:Chat)-[:HAS]-(m:Message)
     WITH c AS chat, m.sent_datetime as datetime
     ORDER BY datetime
     RETURN DISTINCT chat
-    SKIP $start
-    LIMIT $amount
     """
 
     result, _ = db.cypher_query(
         query,
         {
-            "user_id": user.user_id,
-            "start": start,
-            "amount": amount
+            "user_id": user.user_id
         },
         resolve_objects=True
     )
@@ -115,12 +111,10 @@ def fetch_chat(sender, receiver):
 
 @chat_service.post("/get_user_chats")
 def get_user_chats(request):
-    start = request.json["start"]
-    amount = request.json["amount"]
     user_id = request.json["user_id"]
 
     user = BaseUser.nodes.first(user_id=user_id)
-    chats = fetch_user_chats(user, start, amount)
+    chats = fetch_user_chats(user)
 
     json = [
         make_chat_json_view(chat, user)
@@ -133,11 +127,9 @@ def get_user_chats(request):
 @chat_service.post("/get_chat_by_id")
 def get_chat_by_id(request):
     chat_id = request.json["chat_id"]
-    start = request.json["start"]
-    amount = request.json["amount"]
 
     chat = Chat.nodes.first(chat_id=chat_id)
-    messages = get_chat_messages(chat, start, amount)
+    messages = get_chat_messages(chat)
 
     json = [
         make_message_json_view(message)

@@ -62,12 +62,10 @@ def delete_comment(request):
 
 @comments_service.post("/get_post_comments")
 def get_post_comments(request):
-    start = request.json["start"]
-    amount = request.json["amount"]
     post_id = request.json["post_id"]
 
     post = Post.nodes.first(post_id=post_id)
-    comments = post.comments.all()[start:amount]
+    comments = post.comments.all()
 
     json = [
         make_comment_json_view(comment)

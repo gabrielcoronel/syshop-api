@@ -67,11 +67,9 @@ def create_sale_intent(request):
 @sales_service.post("/get_customer_purchases")
 def get_customer_purchases(request):
     customer_id = request.json["customer_id"]
-    start = request.json["start"]
-    amount = request.json["amount"]
 
     customer = Customer.nodes.first(user_id=customer_id)
-    purchases = customer.purchases.all()[start:amount]
+    purchases = customer.purchases.all()
 
     json = [
         make_sale_json_view(purchase)

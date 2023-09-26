@@ -151,11 +151,9 @@ def get_post_by_id(request):
 @posts_service.post("/get_customer_liked_posts")
 def get_customer_liked_posts(request):
     customer_id = request.json["customer_id"]
-    start = request.json["start"]
-    amount = request.json["amount"]
 
     customer = Customer.nodes.first(user_id=customer_id)
-    liked_posts = customer.liked_posts.all()[start:amount]
+    liked_posts = customer.liked_posts.all()
 
     json = [
         make_post_json_view(post, customer_id)
@@ -169,11 +167,9 @@ def get_customer_liked_posts(request):
 def get_store_posts(request):
     store_id = request.json["store_id"]
     customer_id = request.json.get("customer_id")
-    start = request.json["start"]
-    amount = request.json["amount"]
 
     store = Store.nodes.first(user_id=store_id)
-    posts = store.posts.all()[start:amount]
+    posts = store.posts.all()
 
     json = [
         make_post_json_view(post, customer_id)
@@ -183,46 +179,19 @@ def get_store_posts(request):
     return sanic.json(json)
 
 
-# @posts_service.post("/get_all_posts")
-# def get_all_posts(request):
-#     """
-#     Este endpoint es principalmente para pruebas.
-#     En producción no tiene mucho uso.
-#     """
-# 
-#     start = request.json["start"]
-#     amount = request.json["amount"]
-#     sorting_property = request.json["sort_by"]
-# 
-#     posts = Post.nodes.order_by(sorting_property)[start:amount]
-# 
-#     json = [
-#         make_post_json_view(post)
-#         for post in posts
-#     ]
-# 
-#     return sanic.json(json)
-
-
 @posts_service.post("/get_posts_from_customer_following_stores")
 def get_posts_from_customer_following_stores(request):
-    start = request.json["start"]
-    amount = request.json["amount"]
     customer_id = request.json["customer_id"]
 
     query = """
     MATCH (:Customer {user_id: $customer_id})-[:FOLLOWS]-(:Store)-[:POSTED]-(p:Post)
     RETURN DISTINCT p AS posts
     ORDER BY p.publication_date DESC
-    SKIP $start
-    LIMIT $amount
     """
 
     result, _ = db.cypher_query(
         query,
         {
-            "start": start,
-            "amount": amount,
             "customer_id": customer_id
         },
         resolve_objects=True
@@ -238,8 +207,6 @@ def get_posts_from_customer_following_stores(request):
 
 @posts_service.post("/search_posts_by_metadata")
 def search_posts_by_metadata(request):
-    start = request.json["start"]
-    amount = request.json["amount"]
     searched_text = request.json["searched_text"]
     categories = request.json["categories"]
     sorting_property = request.json["sorting_property"]
@@ -260,15 +227,11 @@ def search_posts_by_metadata(request):
     AND $minimum_price <= p.price <= $maximum_price
     RETURN DISTINCT p AS posts
     ORDER BY $sorting_property {sorting_schema_keyword}
-    SKIP $start
-    LIMIT $amount
     """
 
     result, _ = db.cypher_query(
         query,
         {
-            "start": start,
-            "amount": amount,
             "searched_text": searched_text,
             "categories": categories,
             "sorting_property": sorting_property,

@@ -172,13 +172,11 @@ def get_store_by_id(request):
 
 @stores_service.post("/search_stores_by_name")
 def search_stores_by_name(request):
-    start = request.json["start"]
-    amount = request.json["amount"]
     searched_name = request.json["search"]
 
     search_results = Store.nodes.filter(
         name__icontains=searched_name
-    )[start:amount]
+    )
 
     json = [
         store.__properties__
