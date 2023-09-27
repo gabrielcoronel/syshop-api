@@ -108,7 +108,8 @@ def activate_delivery(request):
     customer = customer_location.user.single()
 
     if store_location_or_none is None:
-        raise SanicException("Could not find store location")
+        # Diseñe bien el frontend, para que esto no pase
+        raise SanicException("STORE_LOCATION_NOT_FOUND")
 
     delivery_response = start_uber_delivery(
         customer,
@@ -184,7 +185,8 @@ def uber_delivery_status_webhook(request):
     signature = request.headers["X-Postmates-Signature"]
 
     if not is_uber_webhook_payload_safe(payload, signature):
-        raise SanicException("Unsafe payload or signature")
+        # Esperemos que no pase
+        raise SanicException("UNSAFE_UBER_PAYLOAD_OR_SIGNATURE")
 
     new_uber_state = payload["status"]
     uber_delivery_id = payload["data"]["id"]

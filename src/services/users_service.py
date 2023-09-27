@@ -34,10 +34,13 @@ def sign_in_user_with_plain_account(request):
     email = request.json["email"]
     request_password = request.json["password"]
 
-    plain_account = PlainAccount.nodes.first(email=email)
+    plain_account = PlainAccount.nodes.first_or_none(email=email)
+
+    if plain_account is None:
+        raise SanicException("INCORRECT_CREDENTIALS")
 
     if not is_password_correct(plain_account, request_password):
-        raise SanicException("Incorrect password")
+        raise SanicException("INCORRECT_CREDENTIALS")
 
     user = plain_account.user.single()
 
@@ -49,9 +52,12 @@ def sign_in_user_with_plain_account(request):
 def sign_in_user_with_google_account(request):
     google_unique_identifier = request.json["google_unique_identifier"]
 
-    google_account = GoogleAccount.nodes.first(
+    google_account = GoogleAccount.nodes.first_or_none(
         google_unique_identifier=google_unique_identifier
     )
+
+    if (google_account is None):
+        raise SanicException("GOOGLE_ACCOUNT_NOT_FOUND")
 
     user = google_account.user.single()
 
@@ -79,7 +85,7 @@ def change_user_email(request):
     plain_account = BaseUser.nodes.first(user_id=user_id).account.single()
 
     if not is_password_correct(plain_account, password):
-        raise SanicException("Incorrect password")
+        raise SanicException("INCORRECT_PASSWORD")
 
     plain_account.email = new_email
     plain_account.save()
@@ -96,7 +102,7 @@ def change_user_password(request):
     plain_account = BaseUser.nodes.first(user_id=user_id).account.single()
 
     if not is_password_correct(plain_account, old_password):
-        raise SanicException("Incorrect password")
+        raise SanicException("INCORRECT_PASSWORD")
 
     plain_account.password = encrypt(new_password)
     plain_account.save()

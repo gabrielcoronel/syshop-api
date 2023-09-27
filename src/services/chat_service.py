@@ -203,7 +203,8 @@ def edit_message(request):
     message = Message.nodes.first(message_id=message_id)
 
     if message.content_type.lower() != "text":
-        raise SanicException("Cannot edit non-text messages")
+        # Diseñe bien el frontend, para que esto no pase
+        raise SanicException("EDIT_NON_TEXT_MESSAGE")
 
     message.content = request.json["content"]
     message.save()

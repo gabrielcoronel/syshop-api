@@ -17,7 +17,7 @@ def is_plain_account_email_available(email):
 
 def create_plain_account(email, password):
     if not is_plain_account_email_available(email):
-        raise SanicException("Email is unavailable")
+        raise SanicException("UNAVAILABLE_EMAIL")
 
     encrypted_password = encrypt(password)
 
