@@ -86,7 +86,10 @@ def like_post(request):
     post = Post.nodes.first(post_id=post_id)
     customer = Customer.nodes.first(user_id=customer_id)
 
-    post.liking_customers.connect(customer)
+    if not post.liking_customers.is_connected(customer):
+        post.liking_customers.connect(customer)
+    else:
+        post.liking_customers.disconnect(customer)
 
     return sanic.empty()
 
