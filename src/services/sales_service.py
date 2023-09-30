@@ -14,9 +14,16 @@ sales_service = sanic.Blueprint(
 
 def make_sale_json_view(sale):
     post = sale.post.single()
+    multimedia_items = [
+        item.content_bytes
+        for item in post.multimedia_items.all()
+    ]
 
     json = {
-        "post": post.__properties__,
+        "post": {
+            **post.__properties__,
+            "multimedia": multimedia_items
+        },
         **sale.__properties__
     }
 

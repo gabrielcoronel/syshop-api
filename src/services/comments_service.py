@@ -13,6 +13,8 @@ comments_service = sanic.Blueprint(
 def make_comment_json_view(comment):
     user = comment.user.single()
 
+    print("user", user)
+
     json = {
         **comment.__properties__,
         "user_name": format_user_name(user),

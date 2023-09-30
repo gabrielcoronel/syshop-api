@@ -42,7 +42,7 @@ def create_store(store, location, multimedia_items):
 def does_customer_follow_store(customer, store):
     query = """
     MATCH (:Customer {user_id: $customer_id})-[r:FOLLOWS]-(:Store {user_id: $store_id})
-    RETURN COUNT(r) > 1
+    RETURN COUNT(r) >= 1
     """
 
     result, _ = db.cypher_query(
@@ -138,7 +138,10 @@ def follow_store(request):
     customer = Customer.nodes.first(user_id=customer_id)
     store = Store.nodes.first(user_id=store_id)
 
-    store.followers.connect(customer)
+    if not store.followers.is_connected(customer):
+        store.followers.connect(customer)
+    else:
+        store.followers.disconnect(customer)
 
     return sanic.empty()
 
