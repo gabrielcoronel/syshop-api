@@ -63,6 +63,9 @@ def create_sale_intent(request):
     sale.post.connect(post)
     customer.purchases.connect(sale)
 
+    post.amount -= 1
+    post.save()
+
     json = {
         "stripe_client_secret": payment_intent.client_secret,
         "sale_id": sale.sale_id
