@@ -57,8 +57,7 @@ def create_sale_intent(request):
     )
     sale = Sale(
         amount=amount,
-        stripe_payment_intent_id=payment_intent["id"],
-        purchase_date=None
+        stripe_payment_intent_id=payment_intent["id"]
     ).save()
 
     sale.post.connect(post)

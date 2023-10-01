@@ -11,7 +11,7 @@ from neomodel import (
 class Sale(StructuredNode):
     sale_id = UniqueIdProperty()
     amount = IntegerProperty(required=True)
-    purchase_date = DateTimeProperty(required=False)
+    purchase_date = DateTimeProperty(default_now=True)
     stripe_payment_intent_id = StringProperty(unique_index=True, required=True)
 
     post = Relationship("models.post.Post", "SOLD")
