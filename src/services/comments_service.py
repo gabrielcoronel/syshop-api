@@ -13,13 +13,18 @@ comments_service = sanic.Blueprint(
 def make_comment_json_view(comment):
     user = comment.user.single()
 
-    print("user", user)
-
-    json = {
-        **comment.__properties__,
-        "user_name": format_user_name(user),
-        "user_picture": user.picture
-    }
+    if user is None:
+        json = {
+            **comment.__properties__,
+            "user_name": "Usuario de SyShop",
+            "user_picture": ""
+        }
+    else:
+        json = {
+            **comment.__properties__,
+            "user_name": format_user_name(user),
+            "user_picture": user.picture
+        }
 
     return json
 
@@ -68,6 +73,8 @@ def get_post_comments(request):
 
     post = Post.nodes.first(post_id=post_id)
     comments = post.comments.all()
+
+    print("get_post_comments", comments)
 
     json = [
         make_comment_json_view(comment)

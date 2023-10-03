@@ -11,6 +11,8 @@ def get_user_websocket_connections_ids(user):
 def format_user_name(user):
     user_type = user.__class__.__name__
 
+    print("format_user_name", user_type)
+
     match user_type:
         case "Customer":
             return f"{user.name} {user.first_surname} {user.second_surname}"
