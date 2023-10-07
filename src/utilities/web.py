@@ -1,6 +1,5 @@
 import requests
 from base64 import b64encode
-from os import getenv
 
 
 def download_file_in_base64(url):
