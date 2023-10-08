@@ -252,6 +252,16 @@ def search_posts_by_metadata(request):
     return sanic.json(json)
 
 
+@posts_service.post("/search_posts_by_image")
+def search_posts_by_image(request):
+    picture = request.json["picture"]
+    customer_id = request.json["customer_id"]
+
+    print("PICTURE RECEIVED", picture)
+
+    return sanic.empty()
+
+
 @posts_service.post("/get_maximum_price")
 def get_maximum_price(request):
     ordered_posts = Post.nodes.order_by("-price")
