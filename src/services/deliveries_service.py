@@ -145,6 +145,23 @@ def get_store_inactive_deliveries(request):
     return sanic.json(json)
 
 
+@deliveries_service.post("/get_store_active_deliveries")
+def get_store_active_deliveries(request):
+    store_id = request.json["store_id"]
+
+    store = Store.nodes.first(user_id=store_id)
+    sales = store.sales.all()
+    deliveries = get_deliveries_from_sales(sales)
+    inactive_deliveries = filter(lambda d: d.is_active, deliveries)
+
+    json = [
+        make_delivery_json_view(delivery)
+        for delivery in inactive_deliveries
+    ]
+
+    return sanic.json(json)
+
+
 @deliveries_service.post("/get_customer_inactive_deliveries")
 def get_customer_inactive_deliveries(request):
     customer_id = request.json["customer_id"]

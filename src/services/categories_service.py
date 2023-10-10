@@ -13,7 +13,7 @@ def search_categories_by_name(request):
 
     search_results = Category.nodes.filter(
         name__icontains=searched_name
-    )
+    )[:3]
 
     json = [
         category.name

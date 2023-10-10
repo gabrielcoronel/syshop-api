@@ -159,13 +159,15 @@ def get_store_by_id(request):
         for store_multimedia_item in store.multimedia.all()
     ]
     follower_count = len(store.followers.all())
-    account_type = store.account.single().__class__.__name__
+    account = store.account.single()
+    account_type = account.__class__.__name__
 
     json = {
         **store.__properties__,
         "multimedia": multimedia_items,
         "location": location.__properties__,
         "follower_count": follower_count,
+        "email": account.email if account_type == "PlainAccount" else None,
         "does_customer_follow_store": does_customer_follow_store(customer, store),
         "account_type": account_type
     }
