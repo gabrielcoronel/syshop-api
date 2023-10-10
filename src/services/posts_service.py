@@ -143,7 +143,7 @@ def delete_post(request):
 @posts_service.post("/get_post_by_id")
 def get_post_by_id(request):
     post_id = request.json["post_id"]
-    customer_id = request.json["customer_id"]
+    customer_id = request.json.get("customer_id")
 
     post = Post.nodes.first(post_id=post_id)
     json = make_post_json_view(post, customer_id)
@@ -255,7 +255,7 @@ def search_posts_by_metadata(request):
 @posts_service.post("/search_posts_by_image")
 def search_posts_by_image(request):
     picture = request.json["picture"]
-    customer_id = request.json["customer_id"]
+    customer_id = request.json.get("customer_id")
 
     print("PICTURE RECEIVED", picture)
 

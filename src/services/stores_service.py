@@ -99,7 +99,7 @@ def sign_up_store_with_google_account(request):
     )
     google_account = GoogleAccount(
         google_unique_identifier=google_unique_identifier
-    )
+    ).save()
 
     store.account.connect(google_account)
 
@@ -149,10 +149,10 @@ def follow_store(request):
 @stores_service.post("/get_store_by_id")
 def get_store_by_id(request):
     store_id = request.json["store_id"]
-    customer_id = request.json["customer_id"]
+    customer_id = request.json.get("customer_id")
 
     store = Store.nodes.first(user_id=store_id)
-    customer = Customer.nodes.first(user_id=customer_id)
+    customer = Customer.nodes.first(user_id=customer_id) if customer_id is not None else None
     location = store.location.single()
     multimedia_items = [
         store_multimedia_item.content_bytes
@@ -168,7 +168,7 @@ def get_store_by_id(request):
         "location": location.__properties__,
         "follower_count": follower_count,
         "email": account.email if account_type == "PlainAccount" else None,
-        "does_customer_follow_store": does_customer_follow_store(customer, store),
+        "does_customer_follow_store": does_customer_follow_store(customer, store) if customer is not None else None,
         "account_type": account_type
     }
 
