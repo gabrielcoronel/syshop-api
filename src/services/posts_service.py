@@ -1,9 +1,13 @@
 import sanic
+import boto3
 from neomodel import db
 from models.post import Post
 from models.users import Store, Customer
 from models.category import Category
 from models.post_multimedia_item import PostMultimediaItem
+from dotenv import load_dotenv
+
+load_dotenv()
 
 posts_service = sanic.Blueprint("PostsService", url_prefix="/posts_service")
 
@@ -55,6 +59,25 @@ def make_post_json_view(post, customer_id):
     }
 
     return json
+
+
+def get_image_keywords(image):
+    session = boto3.session.Session()
+    client = session.client("rekognition")
+
+    response = client.detect_labels(
+        Image={
+            "Bytes": bytes(image, encoding="utf-8")
+        },
+        Features=["GENERAL_LABELS"]
+    )
+
+    keywords = [
+        label["Name"]
+        for label in response["Labels"]
+    ]
+
+    return keywords
 
 
 @posts_service.post("/create_post")
@@ -257,9 +280,29 @@ def search_posts_by_image(request):
     picture = request.json["picture"]
     customer_id = request.json.get("customer_id")
 
-    print("PICTURE RECEIVED", picture)
+    keywords = get_image_keywords(picture)
 
-    return sanic.empty()
+    query = f"""
+    MATCH (p:Post)
+    WHERE any(k IN $keywords WHERE p.title CONTAINS k)
+    OR any(k IN $keywords WHERE p.description CONTAINS k)
+    RETURN p
+    """
+
+    result, _ = db.cypher_query(
+        query,
+        {
+            "keywords": keywords
+        },
+        resolve_objects=True
+    )
+
+    json = [
+        make_post_json_view(row[0], None)
+        for row in result
+    ]
+
+    return sanic.json(json)
 
 
 @posts_service.post("/get_maximum_price")

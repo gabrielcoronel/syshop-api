@@ -16,6 +16,29 @@ stores_service = sanic.Blueprint(
 )
 
 
+def make_store_json_view(store, customer):
+    location = store.location.single()
+    multimedia_items = [
+        store_multimedia_item.content_bytes
+        for store_multimedia_item in store.multimedia.all()
+    ]
+    follower_count = len(store.followers.all())
+    account = store.account.single()
+    account_type = account.__class__.__name__
+
+    json = {
+        **store.__properties__,
+        "multimedia": multimedia_items,
+        "location": location.__properties__,
+        "follower_count": follower_count,
+        "email": account.email if account_type == "PlainAccount" else None,
+        "does_customer_follow_store": does_customer_follow_store(customer, store) if customer is not None else None,
+        "account_type": account_type
+    }
+
+    return json
+
+
 def create_store_multimedia_items(store, content_bytes_list):
     for content_bytes in content_bytes_list:
         store_multimedia_item = StoreMultimediaItem(
@@ -153,24 +176,8 @@ def get_store_by_id(request):
 
     store = Store.nodes.first(user_id=store_id)
     customer = Customer.nodes.first(user_id=customer_id) if customer_id is not None else None
-    location = store.location.single()
-    multimedia_items = [
-        store_multimedia_item.content_bytes
-        for store_multimedia_item in store.multimedia.all()
-    ]
-    follower_count = len(store.followers.all())
-    account = store.account.single()
-    account_type = account.__class__.__name__
 
-    json = {
-        **store.__properties__,
-        "multimedia": multimedia_items,
-        "location": location.__properties__,
-        "follower_count": follower_count,
-        "email": account.email if account_type == "PlainAccount" else None,
-        "does_customer_follow_store": does_customer_follow_store(customer, store) if customer is not None else None,
-        "account_type": account_type
-    }
+    json = make_store_json_view(store, customer)
 
     return sanic.json(json)
 
@@ -184,7 +191,7 @@ def search_stores_by_name(request):
     )
 
     json = [
-        store.__properties__
+        make_store_json_view(store, None)
         for store in search_results
     ]
 
