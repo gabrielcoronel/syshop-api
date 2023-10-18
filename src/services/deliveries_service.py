@@ -151,12 +151,15 @@ def get_store_active_deliveries(request):
 
     store = Store.nodes.first(user_id=store_id)
     sales = store.sales.all()
+    print("SALES", sales)
     deliveries = get_deliveries_from_sales(sales)
-    inactive_deliveries = filter(lambda d: d.is_active, deliveries)
+    print("DELIVERIES", deliveries)
+    active_deliveries = filter(lambda d: d.is_active, deliveries)
+    print("ACTIVE DELIVERIES", active_deliveries)
 
     json = [
         make_delivery_json_view(delivery)
-        for delivery in inactive_deliveries
+        for delivery in active_deliveries
     ]
 
     return sanic.json(json)

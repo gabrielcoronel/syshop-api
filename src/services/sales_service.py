@@ -62,6 +62,7 @@ def create_sale_intent(request):
 
     sale.post.connect(post)
     customer.purchases.connect(sale)
+    store.sales.connect(sale)
 
     post.amount -= amount
     post.save()

@@ -1,5 +1,7 @@
 import sanic
 import boto3
+from datauri import DataURI
+from os import getenv
 from neomodel import db
 from models.post import Post
 from models.users import Store, Customer
@@ -62,12 +64,15 @@ def make_post_json_view(post, customer_id):
 
 
 def get_image_keywords(image):
-    session = boto3.session.Session()
-    client = session.client("rekognition")
+    session = boto3.session.Session(
+        aws_access_key_id=getenv("AWS_ACCESS_KEY"),
+        aws_secret_access_key=getenv("AWS_SECRET_ACCESS_KEY")
+    )
+    client = session.client("rekognition", region_name="us-west-1")
 
     response = client.detect_labels(
         Image={
-            "Bytes": bytes(image, encoding="utf-8")
+            "Bytes": DataURI(f"data:image/jpeg;base64,{image}").data
         },
         Features=["GENERAL_LABELS"]
     )
@@ -297,10 +302,15 @@ def search_posts_by_image(request):
         resolve_objects=True
     )
 
-    json = [
+    posts = [
         make_post_json_view(row[0], None)
         for row in result
     ]
+
+    json = {
+        "keywords": keywords,
+        "posts": posts
+    }
 
     return sanic.json(json)
 
