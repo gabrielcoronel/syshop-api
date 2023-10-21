@@ -15,6 +15,7 @@ from services.categories_service import categories_service
 from services.locations_service import locations_service
 from services.sales_service import sales_service
 from services.deliveries_service import deliveries_service
+from services.reports_service import reports_service
 
 load_dotenv()
 
@@ -33,3 +34,4 @@ app.blueprint(categories_service)
 app.blueprint(locations_service)
 app.blueprint(sales_service)
 app.blueprint(deliveries_service)
+app.blueprint(reports_service)

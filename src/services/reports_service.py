@@ -4,7 +4,7 @@ from models.users import BaseUser
 from utilities.users import format_user_name
 
 
-reports_service = sanic.BluePrint(
+reports_service = sanic.Blueprint(
     "ReportsService",
     url_prefix="/reports_service"
 )
@@ -26,7 +26,7 @@ def create_report(request):
     user_id = request.json["user_id"]
     content = request.json["content"]
 
-    user = BaseUser.nodes.first(user_id=userd_id)
+    user = BaseUser.nodes.first(user_id=user_id)
     report = Report(content=content).save()
 
     report.user.connect(user)
@@ -48,7 +48,7 @@ def get_all_reports(request):
 
 @reports_service.post("/delete_report")
 def delete_report(request):
-    report_id = request["report_id"]
+    report_id = request.json["report_id"]
 
     report = Report.nodes.first(report_id=report_id)
 
