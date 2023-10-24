@@ -216,6 +216,7 @@ def get_posts_from_customer_following_stores(request):
 
     query = """
     MATCH (:Customer {user_id: $customer_id})-[:FOLLOWS]-(:Store)-[:POSTED]-(p:Post)
+    WHERE p.amount > 0
     RETURN DISTINCT p AS posts
     ORDER BY p.publication_date DESC
     """
@@ -252,7 +253,8 @@ def search_posts_by_metadata(request):
 
     query = f"""
     MATCH (p:Post)-[:HAS]->(c:Category)
-    WHERE {"c.name IN $categories" if len(categories) > 0 else "TRUE"}
+    WHERE p.amount > 0
+    AND {"c.name IN $categories" if len(categories) > 0 else "TRUE"}
     AND ((p.title CONTAINS $searched_text)
          OR (p.description CONTAINS $searched_text))
     AND $minimum_price <= p.price <= $maximum_price
@@ -289,8 +291,11 @@ def search_posts_by_image(request):
 
     query = f"""
     MATCH (p:Post)
-    WHERE any(k IN $keywords WHERE p.title CONTAINS k)
-    OR any(k IN $keywords WHERE p.description CONTAINS k)
+    WHERE p.amount > 0
+    AND (
+        any(k IN $keywords WHERE p.title CONTAINS k)
+        OR any(k IN $keywords WHERE p.description CONTAINS k)
+    )
     RETURN p
     """
 
