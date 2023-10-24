@@ -112,20 +112,20 @@ def activate_delivery(request):
         raise SanicException("STORE_LOCATION_NOT_FOUND")
 
     try:
-        delivery_response = start_uber_delivery(
+        uber_delivery = start_uber_delivery(
             customer,
             customer_location,
             store,
             store_location_or_none,
             sale
         )
-    except exception:
+    except Exception as _:
         raise SanicException("UBER_ERROR")
 
     delivery.is_active = True
-    delivery.uber_state = delivery_response["status"]
-    delivery.uber_delivery_id = delivery_response["id"]
-    delivery.uber_tracking_url = delivery_response["tracking_url"]
+    delivery.uber_state = uber_delivery["status"]
+    delivery.uber_delivery_id = uber_delivery["id"]
+    delivery.uber_tracking_url = uber_delivery["tracking_url"]
     delivery.save()
 
     return sanic.empty()
@@ -154,11 +154,8 @@ def get_store_active_deliveries(request):
 
     store = Store.nodes.first(user_id=store_id)
     sales = store.sales.all()
-    print("SALES", sales)
     deliveries = get_deliveries_from_sales(sales)
-    print("DELIVERIES", deliveries)
     active_deliveries = filter(lambda d: d.is_active, deliveries)
-    print("ACTIVE DELIVERIES", active_deliveries)
 
     json = [
         make_delivery_json_view(delivery)

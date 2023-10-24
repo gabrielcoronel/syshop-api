@@ -74,8 +74,6 @@ def get_post_comments(request):
     post = Post.nodes.first(post_id=post_id)
     comments = post.comments.all()
 
-    print("get_post_comments", comments)
-
     json = [
         make_comment_json_view(comment)
         for comment in comments

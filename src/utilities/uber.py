@@ -39,10 +39,13 @@ def _call_uber_api(payload):
         },
         json=payload
     )
-    print(delivery_response.text)
+
+    print("UBER LOG", delivery_response.text)
     delivery_response.raise_for_status()
 
-    return delivery_response
+    delivery = delivery_response.json()
+
+    return delivery
 
 
 def start_uber_delivery(customer, customer_location, store, store_location, sale):
@@ -80,6 +83,6 @@ def start_uber_delivery(customer, customer_location, store, store_location, sale
         "undeliverable_action": "leave_at_door"
     }
 
-    delivery_response = _call_uber_api(payload)
+    delivery = _call_uber_api(payload)
 
-    return delivery_response
+    return delivery
