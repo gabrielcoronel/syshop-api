@@ -1,96 +1,10 @@
-from os import getenv
-import datetime
 import requests
+import json
+from os import getenv
 from dotenv import load_dotenv
 
 
-def fetch_access_token_response(client_id, client_secret):
-    authentication_url = "https://login.uber.com/oauth/v2/token"
-    payload = {
-        "client_id": client_id,
-        "client_secret": client_secret,
-        "grant_type": "client_credentials",
-        "scope": "eats.deliveries"
-    }
-    headers = {
-        'Content-Type': 'application/x-www-form-urlencoded'
-    }
-
-    response = requests.post(authentication_url, headers=headers, data=payload)
-    response.raise_for_status()
-
-    json = response.json()
-
-    return json
-
-
-def parse_future_datetime_from_seconds(seconds):
-    difference = datetime.timedelta(seconds)
-    current_datetime = datetime.datetime.now()
-    future_datetime = current_datetime + difference
-
-    return future_datetime
-
-
-class UberDirectClient:
-    def __init__(self, customer_id, client_id, client_secret):
-        response = fetch_access_token_response(client_id, client_secret)
-
-        self.customer_id = customer_id
-        self.access_token = response["access_token"]
-        self.expiration_datetime = parse_future_datetime_from_seconds(
-            response["expires_in"]
-        )
-
-    def _do_json_post_request(self, endpoint_name, payload):
-        url = (
-            f"https://api.uber.com/v1/customers/{self.customer_id}/{endpoint_name}"
-        )
-
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {self.access_token}",
-        }
-
-        response = requests.post(url, headers=headers, json=payload)
-        response.raise_for_status()
-
-        json = response.json()
-
-        return json
-
-    def has_access_token_expired(self):
-        current_datetime = datetime.datetime.now()
-
-        return self.expiration_datetime < current_datetime
-
-    def refresh_access_token(self):
-        response = fetch_access_token_response(
-            self.client_id,
-            self.client_secret
-        )
-
-        self.access_token = response["access_token"]
-        self.expiration_datetime = parse_future_datetime_from_seconds(
-            response["expires_in"]
-        )
-
-    def create_delivery(self, payload):
-        if self.has_access_token_expired():
-            self.refresh_access_token()
-
-        json = self._do_json_post_request("deliveries", payload)
-
-        return json
-
-
 load_dotenv()
-
-customer_id = getenv("UBER_CUSTOMER_ID")
-client_id = getenv("UBER_CLIENT_ID")
-client_secret = getenv("UBER_CLIENT_SECRET")
-
-client = UberDirectClient(customer_id, client_id, client_secret)
 
 
 def _format_phone_number(raw_phone_number):
@@ -99,24 +13,60 @@ def _format_phone_number(raw_phone_number):
     return formatted_phone_number
 
 
+def _call_uber_api(payload):
+    customer_id = getenv("UBER_CUSTOMER_ID")
+    client_id = getenv("UBER_CLIENT_ID")
+    client_secret = getenv("UBER_CLIENT_SECRET")
+
+    access_token_response = requests.post(
+        'https://login.uber.com/oauth/v2/token',
+        data={
+            'client_id': client_id,
+            'client_secret': client_secret,
+            'grant_type': 'client_credentials',
+            'scope': 'eats.deliveries',
+        }
+    )
+    access_token_response.raise_for_status()
+
+    access_token = access_token_response.json()["access_token"]
+
+    delivery_response = requests.post(
+        f'https://api.uber.com/v1/customers/{customer_id}/deliveries',
+        headers={
+            'Content-Type': 'application/json',
+            'Authorization': f'Bearer {access_token}',
+        },
+        json=payload
+    )
+    print(delivery_response.text)
+    delivery_response.raise_for_status()
+
+    return delivery_response
+
+
 def start_uber_delivery(customer, customer_location, store, store_location, sale):
     payload = {
-        "pickup_address": {
+        "pickup_address": json.dumps({
             "street_address": [store_location.street_address],
             "city": store_location.city,
             "state": store_location.state,
             "zip_code": store_location.zip_code
-        },
+        }),
         "pickup_name": store_location.place_name,
         "pickup_phone_number": _format_phone_number(store.phone_number),
+        "pickup_latitude": store_location.latitude,
+        "pickup_longitude": store_location.longitude,
         "dropoff_name": customer_location.place_name,
         "dropoff_phone_number": _format_phone_number(customer.phone_number),
-        "dropoff_address": {
+        "dropoff_latitude": customer_location.latitude,
+        "dropoff_longitude": customer_location.longitude,
+        "dropoff_address": json.dumps({
             "street_address": [customer_location.street_address],
             "city": customer_location.city,
             "state": customer_location.state,
             "zip_code": customer_location.zip_code
-        },
+        }),
         "manifest_items": [
             {
                 "quantity": sale.amount
@@ -130,6 +80,6 @@ def start_uber_delivery(customer, customer_location, store, store_location, sale
         "undeliverable_action": "leave_at_door"
     }
 
-    delivery_response = client.create_delivery(payload)
+    delivery_response = _call_uber_api(payload)
 
     return delivery_response

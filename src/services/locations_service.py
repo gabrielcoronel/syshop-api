@@ -56,6 +56,8 @@ def update_customer_location(request):
     location.city = request.json["city"]
     location.state = request.json["state"]
     location.zip_code = request.json["zip_code"]
+    location.latitude = request.json["latitude"]
+    location.longitude = request.json["longitude"]
 
     location.save()
 
@@ -86,6 +88,8 @@ def update_store_location(request):
     location.city = request.json["city"]
     location.state = request.json["state"]
     location.zip_code = request.json["zip_code"]
+    location.latitude = request.json["latitude"]
+    location.longitude = request.json["longitude"]
 
     location.save()
 

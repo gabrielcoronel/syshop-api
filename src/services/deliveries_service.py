@@ -111,13 +111,16 @@ def activate_delivery(request):
         # Diseñe bien el frontend, para que esto no pase
         raise SanicException("STORE_LOCATION_NOT_FOUND")
 
-    delivery_response = start_uber_delivery(
-        customer,
-        customer_location,
-        store,
-        store_location_or_none,
-        sale
-    )
+    try:
+        delivery_response = start_uber_delivery(
+            customer,
+            customer_location,
+            store,
+            store_location_or_none,
+            sale
+        )
+    except exception:
+        raise SanicException("UBER_ERROR")
 
     delivery.is_active = True
     delivery.uber_state = delivery_response["status"]
