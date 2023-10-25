@@ -10,9 +10,7 @@ def is_plain_account_email_available(email):
     if plain_account_or_none is not None:
         return False
 
-    is_valid = validate_email(email)
-
-    return is_valid
+    return True
 
 
 def create_plain_account(email, password):
