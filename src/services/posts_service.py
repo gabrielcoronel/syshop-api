@@ -63,6 +63,24 @@ def make_post_json_view(post, customer_id):
     return json
 
 
+def translate_keyword(keyword):
+    session = boto3.session.Session(
+        aws_access_key_id=getenv("AWS_ACCESS_KEY"),
+        aws_secret_access_key=getenv("AWS_SECRET_ACCESS_KEY")
+    )
+    client = session.client("translate", region_name="us-west-1")
+
+    response = client.translate_text(
+        Text=keyword,
+        SourceLanguageCode="en",
+        TargetLanguageCode="es"
+    )
+
+    translated = response["TranslatedText"]
+
+    return translated
+
+
 def get_image_keywords(image):
     session = boto3.session.Session(
         aws_access_key_id=getenv("AWS_ACCESS_KEY"),
@@ -78,7 +96,7 @@ def get_image_keywords(image):
     )
 
     keywords = [
-        label["Name"]
+        translate_keyword(label["Name"])
         for label in response["Labels"]
     ]
 
@@ -255,8 +273,8 @@ def search_posts_by_metadata(request):
     MATCH (p:Post)-[:HAS]->(c:Category)
     WHERE p.amount > 0
     AND {"c.name IN $categories" if len(categories) > 0 else "TRUE"}
-    AND ((p.title CONTAINS $searched_text)
-         OR (p.description CONTAINS $searched_text))
+    AND ((toLower(p.title) CONTAINS toLower($searched_text))
+         OR (toLower(p.description) CONTAINS toLower($searched_text)))
     AND $minimum_price <= p.price <= $maximum_price
     RETURN DISTINCT p AS posts
     ORDER BY $sorting_property {sorting_schema_keyword}
@@ -293,8 +311,8 @@ def search_posts_by_image(request):
     MATCH (p:Post)
     WHERE p.amount > 0
     AND (
-        any(k IN $keywords WHERE p.title CONTAINS k)
-        OR any(k IN $keywords WHERE p.description CONTAINS k)
+        any(k IN $keywords WHERE toLower(p.title) CONTAINS toLower(k))
+        OR any(k IN $keywords WHERE toLower(p.description) CONTAINS toLower(k))
     )
     RETURN p
     """
