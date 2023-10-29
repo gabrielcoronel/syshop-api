@@ -26,6 +26,7 @@ def fetch_user_chats(user):
     query = """
     MATCH (:BaseUser {user_id: $user_id})-[:COMMUNICATES]-(c:Chat)-[:HAS]-(m:Message)
     MATCH (c)-[:COMMUNICATES]-(r:BaseUser)
+    WHERE r.user_id <> $user_id
     WITH c AS chat, r AS receiver, m.sent_datetime as datetime
     ORDER BY datetime
     RETURN DISTINCT chat, receiver
