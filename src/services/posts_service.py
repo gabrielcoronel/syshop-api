@@ -181,6 +181,9 @@ def delete_post(request):
     for comment in post.comments.all():
         comment.delete()
 
+    for sale in post.sales.all():
+        sale.delete()
+
     post.delete()
 
     return sanic.empty()

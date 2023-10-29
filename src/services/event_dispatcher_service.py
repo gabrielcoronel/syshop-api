@@ -13,8 +13,6 @@ event_dispatcher_service = sanic.Blueprint(
 async def subscribe_to_event_dispatcher(request, connection):
     user_id = await connection.recv()
 
-    print("WEB SOCKET CONNECTED", user_id)
-
     user = BaseUser.nodes.first(user_id=user_id)
     stored_connection = WebsocketConnection().save()
 

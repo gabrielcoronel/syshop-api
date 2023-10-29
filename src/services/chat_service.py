@@ -25,9 +25,10 @@ def get_chat_messages(chat):
 def fetch_user_chats(user):
     query = """
     MATCH (:BaseUser {user_id: $user_id})-[:COMMUNICATES]-(c:Chat)-[:HAS]-(m:Message)
-    WITH c AS chat, m.sent_datetime as datetime
+    MATCH (c)-[:COMMUNICATES]-(r:BaseUser)
+    WITH c AS chat, r AS receiver, m.sent_datetime as datetime
     ORDER BY datetime
-    RETURN DISTINCT chat
+    RETURN DISTINCT chat, receiver
     """
 
     result, _ = db.cypher_query(
@@ -39,7 +40,7 @@ def fetch_user_chats(user):
     )
 
     chats = [
-        row[0]
+        (row[0], row[1])
         for row in result
     ]
 
@@ -47,20 +48,17 @@ def fetch_user_chats(user):
 
 
 def make_chat_json_view(chat, user):
-    if chat.first_user.single().user_id == user.user_id:
-        receiving_user = chat.second_user.single()
-    else:
-        receiving_user = chat.first_user.single()
+    (actual_chat, receiver) = chat
 
-    last_message = get_chat_messages(chat)[0]
+    last_message = get_chat_messages(actual_chat)[0]
 
     json = {
-        **chat.__properties__,
+        **actual_chat.__properties__,
         "user": {
-            "picture": receiving_user.picture,
-            "name": format_user_name(receiving_user),
-            "user_id": receiving_user.user_id,
-            "phone_number": receiving_user.phone_number
+            "picture": receiver.picture,
+            "name": format_user_name(receiver),
+            "user_id": receiver.user_id,
+            "phone_number": receiver.phone_number
         },
         "last_message": last_message.__properties__
     }

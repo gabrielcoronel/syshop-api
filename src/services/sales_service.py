@@ -1,5 +1,5 @@
 import sanic
-from datetime import datetime
+from datetime import datetime, timedelta
 from models.post import Post
 from models.sale import Sale
 from models.users import Store, Customer
@@ -123,6 +123,77 @@ def get_store_sales(request):
     ]
 
     return sanic.json(json)
+
+
+@sales_service.post("/get_store_sales_report")
+def get_store_sales_report(request):
+    store_id = request.json["store_id"]
+
+    store = Store.nodes.first(user_id=store_id)
+
+    sales_today_amount = len(store.sales.filter(
+        purchase_date__gt=datetime.now() - timedelta(hours=24)
+    ))
+    sales_this_week_amount = len(store.sales.filter(
+        purchase_date__gt=datetime.now() - timedelta(days=7)
+    ))
+    sales_this_month_amount = len(store.sales.filter(
+        purchase_date__gt=datetime.now() - timedelta(days=30)
+    ))
+    sales_this_year_amount = len(store.sales.filter(
+        purchase_date__gt=datetime.now() - timedelta(days=365)
+    ))
+
+    json = {
+        "amount_today": sales_today_amount,
+        "amount_this_week": sales_this_week_amount,
+        "amount_this_month": sales_this_month_amount,
+        "amount_this_year": sales_this_year_amount
+    }
+
+    return sanic.json(json)
+
+
+@sales_service.post("/get_store_sales_chart_data")
+def get_store_sales_chart_data(request):
+    store_id = request.json["store_id"]
+
+    store = Store.nodes.first(user_id=store_id)
+    current_year = datetime.now().year
+    current_month = datetime.now().month
+
+    json = []
+
+    for i in range(5):
+        sales_amount = len(list(filter(
+            lambda s: s.purchase_date.year == current_year and s.purchase_date.month == current_month,
+            store.sales.all()
+        )))
+        month_label = [
+            "Enero",
+            "Febrero",
+            "Marzo",
+            "Abril",
+            "Mayo",
+            "Junio",
+            "Julio",
+            "Agosto",
+            "Septiembre",
+            "Octubre",
+            "Noviembre",
+            "Diciembre"
+        ][current_month - 1]
+        year_label = str(current_year)
+
+        json.append([month_label, year_label, sales_amount])
+
+        if current_month - 1 <= 0:
+            current_year -= 1
+            current_month = 12
+        else:
+            current_month -= 1
+
+    return sanic.json(list(reversed(json)))
 
 
 @sales_service.post("/stripe_payment_intent_status_webhook")

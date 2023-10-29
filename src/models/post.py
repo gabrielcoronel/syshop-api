@@ -22,3 +22,4 @@ class Post(StructuredNode):
     comments = Relationship("models.comment.Comment", "HAS")
     liking_customers = Relationship("models.users.Customer", "LIKES")
     store = Relationship("models.users.Store", "POSTED")
+    sales = Relationship("models.sale.Sale", "SOLD")
