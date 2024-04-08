@@ -9,12 +9,3 @@ Ténologías usadas:
 #  -API stripe
 #  -Amazon Rekognition (para búsqueda por imagenes)
 #  -API de uber 
-
-
-
-
-
-
-
-
-
