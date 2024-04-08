@@ -1,4 +1,12 @@
 #  SyShop API
 
-API web de estilo RPC que sirve como backend para SyShop, el proyecto de Expotec
-2023 de los Expopanas.
+API web de SyShop, proyecto diseñado para emprendimientos emergentes los cuáles deseen vender sus productos.
+
+Ténologías usadas:
+
+  -React native 
+  -Python
+  -API stripe
+  -Amazon Rekognition (para búsqueda por imagenes)
+  -API de uber 
+
