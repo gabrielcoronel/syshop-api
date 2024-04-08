@@ -10,7 +10,9 @@ Ténologías usadas:
 #  -Amazon Rekognition (para búsqueda por imagenes)
 #  -API de uber 
 
-# ![SyShop log](src/images/SyShop.jpg)
+![Logo de mi proyecto](src/images/SyShop.jpg.png){width=100 height=100}
+
+
 
 
 
