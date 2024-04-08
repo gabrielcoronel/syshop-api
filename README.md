@@ -4,9 +4,16 @@ API web de SyShop, proyecto diseñado para emprendimientos emergentes los cuále
 
 Ténologías usadas:
 
-  -React native 
-  -Python
-  -API stripe
-  -Amazon Rekognition (para búsqueda por imagenes)
-  -API de uber 
+#  -React native 
+# -Python
+#  -API stripe
+#  -Amazon Rekognition (para búsqueda por imagenes)
+#  -API de uber 
+
+# ![SyShop log](src/images/SyShop.jpg)
+
+
+
+
+
 
